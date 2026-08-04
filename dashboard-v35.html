@@ -185,8 +185,10 @@ body{font-family:'Sarabun','Inter',system-ui,sans-serif;background:var(--bg);col
 .in-field{width:150px}
 
 /* Date range picker */
-.date-btn{height:36px;padding:0 12px;border-radius:8px;border:1px solid var(--primary);background:var(--primary);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:8px}
-.date-btn.has-val{background:var(--primary-deep)}
+.date-btn{height:36px;padding:0 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--text);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:8px;transition:.15s}
+.date-btn:hover{border-color:var(--primary)}
+.date-btn.has-val{border-color:var(--primary);background:var(--primary);color:#fff}
+.date-btn.has-val:hover{background:var(--primary-deep)}
 .date-btn i{font-size:15px}
 .dp-pop{position:absolute;top:calc(100% + 6px);right:20px;width:600px;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow-lg);z-index:200;display:none;padding:20px}
 .dp-pop.open{display:block}
