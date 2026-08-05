@@ -796,7 +796,9 @@ function renderQuickActionWidget(){
 
 /* ===== ANALYTICS ===== */
 let anRange=12,analyticsView='created',chSavings,chOutcome;
-const C={primary:'#0C56C9',highlight:'#A3E4D7',lineBlue:'#027BE0',teal:'#019E82',purple:'#8B5CF6',purpleSoft:'#C9BCF8',purpleLine:'#8B5CF6',noaward:'#A0AAB2',noresult:'#D99B9B',insuf:'#E5C185',orange:'#F27326'};
+const C={primary:'#0C56C9',highlight:'#A3E4D7',lineBlue:'#027BE0',teal:'#019E82',purple:'#8B5CF6',purpleSoft:'#C9BCF8',purpleLine:'#8B5CF6',noaward:'#A0AAB2',noresult:'#D99B9B',insuf:'#E5C185',orange:'#F27326',apprGreen:'#2FB380',rejRed:'#E0655B',timeLine:'#8B5CF6',srcExisting:'#0C56C9',srcNew:'#A3E4D7'};
+/* [MOCK] hash คงที่จาก string เพื่ออนุมานข้อมูลเดโมให้เสถียร (ไม่สุ่มใหม่ทุกครั้ง) */
+function hashInt(s){let h=0;s=String(s);for(let i=0;i<s.length;i++){h=(h*31+s.charCodeAt(i))>>>0;}return h;}
 function renderAnalyticsShell(){
   const slot=document.getElementById('analyticsSlot');
   const showToggle=hasRole('purchaser')&&hasRole('approver');
@@ -821,11 +823,23 @@ function analyticsData(){
   const now=new Date(),minDate=new Date(now.getFullYear(),now.getMonth()-anRange+1,1);
   let rows=analyticsSource().filter(a=>new Date(a.auctionStart)>=minDate);
   const months=[];for(let i=anRange-1;i>=0;i--){const d=new Date(now.getFullYear(),now.getMonth()-i,1);months.push({key:`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`,label:d.toLocaleDateString('th-TH',{month:'short',year:'2-digit'})});}
-  const savBy={},volBy={};months.forEach(m=>{savBy[m.key]=0;volBy[m.key]=0;});
+  const savBy={},volBy={},apprBy={},rejBy={},daysSumBy={},daysCntBy={};months.forEach(m=>{savBy[m.key]=0;volBy[m.key]=0;apprBy[m.key]=0;rejBy[m.key]=0;daysSumBy[m.key]=0;daysCntBy[m.key]=0;});
   let totalSav=0,totalSpend=0,totalBudgetAw=0,oc_c=0,oc_nr=0,oc_in=0,oc_na=0,bidSum=0,bidCnt=0,rejected=0;
-  rows.forEach(a=>{const d=new Date(a.auctionStart),key=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;if(volBy[key]!==undefined)volBy[key]++;if(a.status==='Complete'||a.award==='awarded'||a.award==='awaiting-approval'){oc_c++;if(a.budget&&a.winning){const s=a.budget-a.winning;totalSav+=s;totalSpend+=a.winning;totalBudgetAw+=a.budget;if(savBy[key]!==undefined)savBy[key]+=s;}}else if(a.award==='no-result')oc_nr++;else if(a.award==='insufficient')oc_in++;else if(a.award==='no-award')oc_na++;if(a.award==='rejected')rejected++;if(a.bidders>0){bidSum+=a.bidders;bidCnt++;}});
+  /* [MOCK] แหล่งที่มาของผู้ชนะ + รายเดิม/รายใหม่ อนุมานแบบคงที่จาก auctionId (เดโมไม่มีฟิลด์จริง) */
+  const winSrc={req:{existing:0,new:0},ptvn:{existing:0,new:0}};
+  rows.forEach(a=>{const d=new Date(a.auctionStart),key=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;if(volBy[key]!==undefined)volBy[key]++;
+    /* อนุมัติ vs ตีกลับ รายเดือน (นับตามผลของงานที่ผ่านมือผู้อนุมัติ) */
+    const isRej=a.award==='rejected'||a.approvalFlow?.result?.state==='rejected'||a.approvalFlow?.setup?.state==='rejected';
+    if(key in apprBy){if(isRej)rejBy[key]++;else apprBy[key]++;
+      /* เวลาเฉลี่ยที่ใช้อนุมัติ (วัน) — อนุมานคงที่ 1–7 วันจาก auctionId */
+      const days=(hashInt(a.auctionId)%7)+1;daysSumBy[key]+=days;daysCntBy[key]++;}
+    if(a.status==='Complete'||a.award==='awarded'||a.award==='awaiting-approval'){oc_c++;if(a.budget&&a.winning){const s=a.budget-a.winning;totalSav+=s;totalSpend+=a.winning;totalBudgetAw+=a.budget;if(savBy[key]!==undefined)savBy[key]+=s;}
+      /* ผู้ชนะมาจากไหน — เฉพาะงานที่ได้ผู้ชนะแล้ว */
+      const h=hashInt(a.auctionId+'|src');const bySelf=(h%2===0),isNew=(Math.floor(h/2)%3===0);const bucket=bySelf?winSrc.req:winSrc.ptvn;if(isNew)bucket.new++;else bucket.existing++;
+    }else if(a.award==='no-result')oc_nr++;else if(a.award==='insufficient')oc_in++;else if(a.award==='no-award')oc_na++;if(a.award==='rejected')rejected++;if(a.bidders>0){bidSum+=a.bidders;bidCnt++;}});
+  const avgDaysBy={};months.forEach(m=>{avgDaysBy[m.key]=daysCntBy[m.key]?+(daysSumBy[m.key]/daysCntBy[m.key]).toFixed(1):0;});
   const succDenom=oc_c+oc_nr+oc_in+oc_na,succRate=succDenom>0?Math.round(oc_c/succDenom*100):0,avgBid=bidCnt>0?(bidSum/bidCnt).toFixed(1):0,savPct=totalBudgetAw>0?Math.round(totalSav/totalBudgetAw*100):0;
-  return{months,savBy,volBy,totalSav,totalSpend,succRate,succDenom,avgBid,savPct,rejected,approvedCount:oc_c,outcome:{complete:oc_c,noresult:oc_nr,insufficient:oc_in,noaward:oc_na}};
+  return{months,savBy,volBy,apprBy,rejBy,avgDaysBy,winSrc,totalSav,totalSpend,succRate,succDenom,avgBid,savPct,rejected,approvedCount:oc_c,outcome:{complete:oc_c,noresult:oc_nr,insufficient:oc_in,noaward:oc_na}};
 }
 function renderAnalytics(){
   const D=analyticsData(),isAppr=analyticsView==='approved';
@@ -836,15 +850,43 @@ function renderAnalytics(){
     kpi.innerHTML=`<div class="kpi"><div><span class="kpi-val">${D.totalSav.toFixed(1)}</span><span class="kpi-unit">ลบ.</span></div><div class="kpi-label">มูลค่าที่ประหยัดได้</div><div class="kpi-delta delta-up"><i class="ti ti-trending-up"></i> ${D.savPct}% จากงบตั้งต้น</div></div><div class="kpi"><div><span class="kpi-val">${D.totalSpend.toFixed(1)}</span><span class="kpi-unit">ลบ.</span></div><div class="kpi-label">งบที่ใช้จ่ายจริง</div><div class="kpi-delta" style="color:var(--muted)"><i class="ti ti-receipt"></i> ราคาปิดรวม</div></div><div class="kpi"><div><span class="kpi-val">${D.succRate}</span><span class="kpi-unit">%</span></div><div class="kpi-label">อัตราประมูลสำเร็จ</div><div class="kpi-delta delta-up"><i class="ti ti-check"></i> ${D.outcome.complete} จาก ${D.succDenom} งาน</div></div><div class="kpi"><div><span class="kpi-val">${D.avgBid}</span><span class="kpi-unit">ราย</span></div><div class="kpi-label">เฉลี่ยผู้เข้าร่วม</div><div class="kpi-delta delta-up"><i class="ti ti-arrows-join"></i> การแข่งขัน</div></div>`;
   }
   const barColor=isAppr?C.purpleSoft:C.highlight,lineColor=isAppr?C.purpleLine:C.lineBlue;
-  document.getElementById('chSavH').innerHTML=`<div class="t">${isAppr?'มูลค่า Savings จากงานที่อนุมัติ':'Savings & จำนวนงาน รายเดือน'}</div><div class="sub">แท่ง = savings (ลบ.) · เส้น = จำนวนงาน</div>`;
-  document.getElementById('chOutH').innerHTML=`<div class="t">${isAppr?'งานที่อนุมัติ จบยังไง':'ผลการประมูล'}</div><div class="sub">เฉพาะงานที่ประมูลจริง</div>`;
-  const labels=D.months.map(m=>m.label),savData=D.months.map(m=>+D.savBy[m.key].toFixed(1)),volData=D.months.map(m=>D.volBy[m.key]);
+  document.getElementById('chSavH').innerHTML=isAppr
+    ?`<div class="t">อนุมัติ vs ตีกลับ รายเดือน</div><div class="sub">แท่ง = จำนวนงาน (เขียว=อนุมัติ · แดง=ตีกลับ) · เส้น = เวลาเฉลี่ยที่ใช้อนุมัติ (วัน)</div>`
+    :`<div class="t">Savings & จำนวนงาน รายเดือน</div><div class="sub">แท่ง = savings (ลบ.) · เส้น = จำนวนงาน</div>`;
+  document.getElementById('chOutH').innerHTML=isAppr
+    ?`<div class="t">ผู้ชนะมาจากไหน</div><div class="sub">Requester เลือกเอง vs PTVN Sourcing · แยกรายเดิม/รายใหม่</div>`
+    :`<div class="t">ผลการประมูล</div><div class="sub">เฉพาะงานที่ประมูลจริง</div>`;
+  const labels=D.months.map(m=>m.label);
   if(chSavings)chSavings.destroy();
   try{
-  chSavings=new Chart(document.getElementById('chSavings'),{data:{labels,datasets:[{type:'bar',label:'Savings (ลบ.)',data:savData,backgroundColor:barColor,borderRadius:6,yAxisID:'y',order:2},{type:'line',label:'จำนวนงาน',data:volData,borderColor:lineColor,backgroundColor:lineColor,borderWidth:2,tension:.35,pointRadius:3,yAxisID:'y1',order:1}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:true,position:'top',labels:{boxWidth:12,font:{size:11},usePointStyle:true}},tooltip:{callbacks:{label:c=>c.dataset.yAxisID==='y'?` ${c.dataset.label}: ${c.parsed.y} ลบ.`:` ${c.dataset.label}: ${c.parsed.y} งาน`}}},scales:{y:{position:'left',beginAtZero:true,title:{display:true,text:'Savings (ลบ.)',font:{size:10}},grid:{color:'#eef3fa'},ticks:{font:{size:10}}},y1:{position:'right',beginAtZero:true,title:{display:true,text:'จำนวนงาน',font:{size:10}},grid:{drawOnChartArea:false},ticks:{font:{size:10},precision:0}},x:{grid:{display:false},ticks:{font:{size:10}}}}}});
+  if(isAppr){
+    const apprData=D.months.map(m=>D.apprBy[m.key]),rejData=D.months.map(m=>D.rejBy[m.key]),daysData=D.months.map(m=>D.avgDaysBy[m.key]);
+    chSavings=new Chart(document.getElementById('chSavings'),{data:{labels,datasets:[
+      {type:'bar',label:'อนุมัติผ่าน',data:apprData,backgroundColor:C.apprGreen,stack:'jobs',borderRadius:{topLeft:0,topRight:0},yAxisID:'y',order:3},
+      {type:'bar',label:'ตีกลับ',data:rejData,backgroundColor:C.rejRed,stack:'jobs',borderRadius:{topLeft:6,topRight:6},yAxisID:'y',order:2},
+      {type:'line',label:'เวลาเฉลี่ยอนุมัติ (วัน)',data:daysData,borderColor:C.timeLine,backgroundColor:C.timeLine,borderWidth:2,tension:.35,pointRadius:3,yAxisID:'y1',order:1}
+    ]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:true,position:'top',labels:{boxWidth:12,font:{size:11},usePointStyle:true}},tooltip:{callbacks:{label:c=>c.dataset.yAxisID==='y1'?` ${c.dataset.label}: ${c.parsed.y} วัน`:` ${c.dataset.label}: ${c.parsed.y} งาน`}}},scales:{y:{stacked:true,position:'left',beginAtZero:true,title:{display:true,text:'จำนวนงาน',font:{size:10}},grid:{color:'#eef3fa'},ticks:{font:{size:10},precision:0}},y1:{position:'right',beginAtZero:true,title:{display:true,text:'วัน',font:{size:10}},grid:{drawOnChartArea:false},ticks:{font:{size:10}}},x:{stacked:true,grid:{display:false},ticks:{font:{size:10}}}}}});
+  }else{
+    const savData=D.months.map(m=>+D.savBy[m.key].toFixed(1)),volData=D.months.map(m=>D.volBy[m.key]);
+    chSavings=new Chart(document.getElementById('chSavings'),{data:{labels,datasets:[{type:'bar',label:'Savings (ลบ.)',data:savData,backgroundColor:barColor,borderRadius:6,yAxisID:'y',order:2},{type:'line',label:'จำนวนงาน',data:volData,borderColor:lineColor,backgroundColor:lineColor,borderWidth:2,tension:.35,pointRadius:3,yAxisID:'y1',order:1}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:true,position:'top',labels:{boxWidth:12,font:{size:11},usePointStyle:true}},tooltip:{callbacks:{label:c=>c.dataset.yAxisID==='y'?` ${c.dataset.label}: ${c.parsed.y} ลบ.`:` ${c.dataset.label}: ${c.parsed.y} งาน`}}},scales:{y:{position:'left',beginAtZero:true,title:{display:true,text:'Savings (ลบ.)',font:{size:10}},grid:{color:'#eef3fa'},ticks:{font:{size:10}}},y1:{position:'right',beginAtZero:true,title:{display:true,text:'จำนวนงาน',font:{size:10}},grid:{drawOnChartArea:false},ticks:{font:{size:10},precision:0}},x:{grid:{display:false},ticks:{font:{size:10}}}}}});
+  }
   }catch(e){console.warn('Chart render skipped (chSavings):',e);}
-  const ocLabels=['Complete (Awarded)','ไม่มีผู้เสนอ','ผู้เสนอ < 3 ราย','ไม่เลือกผู้ชนะ'],ocColors=[isAppr?C.purpleSoft:C.highlight,C.noresult,C.insuf,C.noaward],ocData=[D.outcome.complete,D.outcome.noresult,D.outcome.insufficient,D.outcome.noaward];
   if(chOutcome)chOutcome.destroy();
+  document.getElementById('chOutcome').closest('.chart-box').classList.toggle('sm',!isAppr);
+  if(isAppr){
+    const srcLabels=['Requester เลือกเอง','PTVN Sourcing'];
+    const existData=[D.winSrc.req.existing,D.winSrc.ptvn.existing],newData=[D.winSrc.req.new,D.winSrc.ptvn.new];
+    const srcColors=[C.srcExisting,C.srcNew],srcNames=['รายเดิม','รายใหม่'];
+    try{
+    chOutcome=new Chart(document.getElementById('chOutcome'),{type:'bar',data:{labels:srcLabels,datasets:[
+      {label:'รายเดิม',data:existData,backgroundColor:C.srcExisting,stack:'src',borderRadius:{topLeft:0,bottomLeft:0,topRight:0,bottomRight:0}},
+      {label:'รายใหม่',data:newData,backgroundColor:C.srcNew,stack:'src',borderRadius:{topRight:6,bottomRight:6}}
+    ]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:true,position:'bottom',labels:{boxWidth:12,font:{size:11},usePointStyle:true}},tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${c.parsed.x} งาน`,footer:items=>{const tot=items.reduce((s,i)=>s+i.parsed.x,0);return `รวม: ${tot} งาน`;}}}},scales:{x:{stacked:true,beginAtZero:true,title:{display:true,text:'จำนวนงาน',font:{size:10}},grid:{color:'#eef3fa'},ticks:{font:{size:10},precision:0}},y:{stacked:true,grid:{display:false},ticks:{font:{size:11}}}}}});
+    }catch(e){console.warn('Chart render skipped (chOutcome):',e);}
+    document.getElementById('outcomeLegend').innerHTML='';
+    return;
+  }
+  const ocLabels=['Complete (Awarded)','ไม่มีผู้เสนอ','ผู้เสนอ < 3 ราย','ไม่เลือกผู้ชนะ'],ocColors=[C.highlight,C.noresult,C.insuf,C.noaward],ocData=[D.outcome.complete,D.outcome.noresult,D.outcome.insufficient,D.outcome.noaward];
   try{
   chOutcome=new Chart(document.getElementById('chOutcome'),{type:'doughnut',data:{labels:ocLabels,datasets:[{data:ocData,backgroundColor:ocColors,borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,cutout:'64%',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>{const tot=ocData.reduce((s,x)=>s+x,0),pct=tot?Math.round(c.parsed/tot*100):0;return ` ${c.label}: ${c.parsed} งาน (${pct}%)`;}}}}}});
   }catch(e){console.warn('Chart render skipped (chOutcome):',e);}
