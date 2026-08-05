@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>eAuction — Widget Workspace v34</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=Inter:wght@300;400;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  /* Primary / Brand Blue — Color Spec */
+  --primary:#0C56C9;--primary-deep:#0E49B5;--secondary:#2F80ED;--accent:#06B6D4;--highlight:#A3E4D7;
+  --bg:#F7FBFD;--surface:#FFFFFF;--line:#E6E8EB;--line-2:#d3d7db;--text:#383838;--muted:#7C7C7C;
+  --hero-grad:linear-gradient(to right,#116FB3 0%,#0E50BD 51%,#49D4FF 100%);
+  --brand:#0C56C9;--brand-lt:#DAF0FF;--brand-mid:#2F80ED;
+  --ok:#17794C;--ok-bg:#DAEFE1;--ok-bd:#A3E4D7;
+  --warn:#a5702a;--warn-bg:#fdf3ea;--warn-bd:#E5C185;
+  --danger:#E03737;--danger-bg:#FEF1EF;--danger-bd:#D99B9B;
+  --blue:#2F80ED;--blue-bg:#DAF0FF;--blue-bd:#0C56C9;
+  --teal:#019E82;--teal-bg:#E6F7F0;--teal-bd:#A3E4D7;
+  --orange:#F27326;--orange-bg:#fdf3ea;--orange-bd:#E5C185;
+  --purple:#8B5CF6;--purple-bg:#EDE9FE;--purple-bd:#d8c9ee;--purple-deep:#7C3AED;
+  --shadow-xs:0 1px 3px rgba(0,0,0,.03);
+  --shadow-sm:0 2px 8px rgba(0,0,0,.03),0 1px 3px rgba(0,0,0,.03);
+  --shadow-md:0 8px 24px rgba(0,0,0,.06);
+  --shadow-lg:0 20px 48px rgba(0,0,0,.12);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Sarabun','Inter',Arial,system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:13px;line-height:1.5;min-height:100vh}
+.container{max-width:1280px;margin:0 auto;padding:0 20px 32px}
+
+.topbar-wrap{position:sticky;top:0;z-index:120;background:var(--hero-grad);box-shadow:0 4px 18px rgba(0,93,196,.2)}
+.topbar-wrap::after{content:'';position:absolute;inset:0;background:radial-gradient(120% 180% at 88% -40%,rgba(255,255,255,.28),transparent 55%);pointer-events:none}
+.topbar{height:54px;display:flex;align-items:center;justify-content:space-between;gap:12px;position:relative;z-index:1}
+.topbar-left{display:flex;align-items:center;gap:16px;height:100%}
+.brand-mark{font-size:19px;font-weight:800;color:#fff;letter-spacing:-.01em;white-space:nowrap}
+.brand-mark .brand-one{font-style:italic}
+.app-name{font-size:14px;font-weight:600;color:#fff}
+.tb-nav{display:flex;align-items:center;gap:20px;height:100%;margin-left:4px}
+.tb-nav-tab{background:none;border:none;color:rgba(255,255,255,.72);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;height:100%;padding:0;position:relative}
+.tb-nav-tab.active{color:#fff}
+.tb-nav-tab.active::after{content:'';position:absolute;left:0;right:0;bottom:0;height:2px;background:#fff;border-radius:2px}
+.topbar-right{display:flex;align-items:center;gap:9px}
+.tb-icon-btn{width:32px;height:32px;border-radius:9px;border:none;background:transparent;display:inline-flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;transition:.15s;position:relative;font-family:inherit;font-size:16px}
+.tb-icon-btn:hover{background:rgba(255,255,255,.16)}
+.tb-badge{position:absolute;top:-2px;right:-2px;min-width:15px;height:15px;padding:0 3px;border-radius:8px;background:#E03737;color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;border:1.5px solid #1a7fc9}
+.tb-vdiv{width:1px;height:20px;background:rgba(255,255,255,.35);margin:0 4px}
+.tb-help-btn{display:flex;align-items:center;gap:4px;background:none;border:none;color:#fff;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;padding:6px 4px}
+.avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--ok-bg);border:none;font-size:11px;font-weight:700;color:var(--teal)}
+.notif-dot{position:absolute;top:-2px;right:-2px;width:8px;height:8px;border-radius:50%;background:#E03737;border:1.5px solid #1a7fc9}
+
+.user-switch{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:3px 4px 3px 9px;backdrop-filter:blur(6px)}
+.user-switch .lbl{font-size:8.5px;color:rgba(255,255,255,.8);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.user-switch select{background:rgba(255,255,255,.92);border:none;border-radius:6px;padding:4px 7px;font-size:10.5px;font-weight:600;color:var(--text);font-family:inherit;cursor:pointer;outline:none}
+
+.action-bar{background:var(--surface);border-bottom:1px solid var(--line);padding:0 24px}
+.action-bar-inner{max-width:1600px;margin:0 auto;min-height:46px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;padding:8px 0}
+.role-badges{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--muted)}
+.action-right{display:flex;align-items:center;gap:8px;margin-left:auto}
+.tb-divider{width:1px;height:20px;background:var(--line);margin:0 2px;flex-shrink:0}
+.btn{display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:12px;cursor:pointer;transition:.15s;font-family:inherit;border-radius:9px;height:36px;padding:0 14px;border:1px solid transparent}
+.btn-ghost{background:var(--surface);border-color:var(--line);color:var(--muted)}
+.btn-ghost:hover{background:#f2f7fd;border-color:var(--line-2);color:var(--text)}
+.btn-create{background:var(--primary);color:#fff;border-color:var(--primary);box-shadow:0 4px 13px rgba(91,135,232,.28)}
+.btn-create:hover{background:var(--primary-deep)}
+.btn-qa{background:#FEF1EF;border-color:#D99B9B;color:#B52A2A}
+.btn-qa:hover{background:#FEF1EF}
+.btn-qa i{color:#E03737}
+.cnt{font-size:10px;font-weight:700;min-width:18px;height:18px;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;padding:0 5px}
+.cnt-red{background:#E03737;color:#fff}
+.cnt-blue{background:var(--primary);color:#fff}
+.cnt-green{background:var(--ok);color:#fff}
+.dd-wrap{position:relative}
+.tb-dropdown{position:absolute;top:calc(100% + 8px);right:0;width:380px;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow-lg);z-index:500;overflow:hidden;display:none}
+.tb-dropdown.open{display:block}
+.tb-dd-header{padding:12px 15px;border-bottom:1px solid var(--line);font-size:12.5px;font-weight:700;color:var(--text);background:var(--bg);display:flex;align-items:center;gap:6px;text-transform:uppercase;letter-spacing:.04em}
+.tb-dd-item{padding:11px 15px;border-bottom:1px solid var(--line);display:flex;gap:10px;align-items:flex-start;cursor:pointer;transition:.12s}
+.tb-dd-item:last-child{border-bottom:none}
+.tb-dd-item:hover{background:#f2f7fd}
+.tb-dd-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:6px}
+.tb-dd-name{font-size:13px;font-weight:700;color:var(--text)}
+.tb-dd-id{font-size:12px;color:var(--primary);font-weight:700;margin-top:2px}
+.tb-dd-sub{font-size:10px;color:var(--muted);margin-top:2px}
+.badge-small{font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px;border:1px solid transparent;white-space:nowrap;flex-shrink:0}
+.b-new{background:var(--danger-bg);color:var(--danger);border-color:var(--danger-bd)}
+.notif-tabs{display:flex;align-items:center;gap:8px;padding:10px 15px;border-bottom:1px solid var(--line)}
+.notif-tab{height:26px;padding:0 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface);font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:6px}
+.notif-tab.active{background:var(--primary);border-color:var(--primary);color:#fff}
+.notif-item{display:flex;gap:10px;padding:11px 15px;border-bottom:1px solid var(--line);cursor:pointer;transition:.12s;align-items:flex-start}
+.notif-item.unread{background:var(--bg)}
+.notif-item:last-child{border-bottom:none}
+.notif-item:hover{background:#f6f9fd}
+.notif-ava{width:30px;height:30px;border-radius:50%;background:var(--ok-bg);color:var(--ok);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.notif-body{flex:1;min-width:0}
+.notif-text{font-size:12px;line-height:1.5;color:var(--text);font-weight:500}
+.notif-time{font-size:10px;color:var(--muted);margin-top:3px}
+.notif-dot-ind{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:6px}
+.tb-dd-header-flex{padding:12px 15px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;background:var(--surface)}
+.tb-dd-header-flex .t{font-size:13px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:6px}
+.tb-dd-header-flex .t i{color:var(--primary)}
+.tb-dd-mark{font-size:11px;font-weight:600;color:var(--brand-mid);cursor:pointer}
+
+.date-dd-wrap{position:relative;display:inline-block}
+.date-dd{position:fixed;top:0;left:0;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow-lg);z-index:400;display:none;padding:16px;width:600px}
+.date-dd.open{display:block}
+.date-dd-cols{display:flex;gap:22px}
+.date-dd-col{flex:1;min-width:0}
+.date-dd-label{font-size:11px;font-weight:700;color:var(--muted);margin-bottom:6px}
+.date-dd-input{height:32px;border:1px solid var(--line);border-radius:9px;padding:0 10px;font-size:12px;width:100%;margin-bottom:10px;font-family:inherit;color:var(--text);background:#fbfcfe}
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.cal-head button{width:24px;height:24px;border:none;background:transparent;cursor:pointer;color:var(--muted);font-size:13px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center}
+.cal-head button:hover{background:#f2f7fd}
+.cal-title{font-size:12px;font-weight:700;color:var(--text)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center}
+.cal-dow{font-size:9.5px;font-weight:700;color:var(--muted);padding:4px 0}
+.cal-day{font-size:11.5px;padding:6px 0;border-radius:7px;cursor:pointer;color:var(--text)}
+.cal-day:hover{background:#f2f7fd}
+.cal-day.muted{color:var(--line-2);cursor:default}
+.cal-day.today{background:var(--primary);color:#fff;font-weight:700}
+.cal-day.selected{background:var(--primary);color:#fff;font-weight:700}
+.date-dd-foot{display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:10px;border-top:1px solid var(--line)}
+.date-dd-today{font-size:11px;color:var(--brand-mid);cursor:pointer;font-weight:600;text-align:center;margin-top:4px}
+.btn-datepick{height:34px;padding:0 12px;border-radius:9px;border:1px solid var(--line);background:var(--surface);color:var(--text);font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:6px;transition:.15s}
+.btn-datepick:hover{border-color:var(--line-2);background:#f2f7fd}
+.btn-datepick.selected{background:var(--primary);color:#fff;border-color:var(--primary)}
+.b-done{background:var(--ok-bg);color:var(--ok);border-color:var(--ok-bd)}
+
+.pill{display:inline-flex;align-items:center;gap:4px;height:22px;padding:0 9px;border-radius:6px;font-size:11px;font-weight:700;border:1px solid transparent;white-space:nowrap}
+.st-draft{background:#F3F3F3;color:#7C7C7C;border-color:#E6E8EB}
+.st-awaiting{background:var(--blue-bg);color:var(--secondary);border-color:#c6d8f2}
+.st-rejected{background:var(--danger-bg);color:var(--danger);border-color:var(--danger-bd)}
+.st-ptvn{background:var(--blue-bg);color:var(--secondary);border-color:#c6d8f2}
+.st-active{background:var(--blue-bg);color:var(--secondary);border-color:#c6d8f2}
+.st-closed{background:#F3F3F3;color:#7C7C7C;border-color:#E6E8EB}
+.st-complete{background:var(--ok-bg);color:var(--ok);border-color:var(--ok-bd)}
+.st-canceled{background:#F3F3F3;color:#7C7C7C;border-color:#E6E8EB}
+.st-live{background:var(--danger-bg);color:var(--danger);border-color:var(--danger-bd)}
+.live-dot{width:8px;height:8px;border-radius:50%;background:var(--ok);position:relative;flex-shrink:0}
+.live-dot::after{content:'';position:absolute;inset:-3px;border-radius:50%;border:1.5px solid var(--ok);animation:pulse 1.6s ease-out infinite}
+.live-dot-sm{width:6px;height:6px;border-radius:50%;background:var(--danger);position:relative;flex-shrink:0;display:inline-block}
+.live-dot-sm::after{content:'';position:absolute;inset:-3px;border-radius:50%;border:1.5px solid var(--danger);animation:pulse 1.6s ease-out infinite}
+@keyframes pulse{0%{transform:scale(.6);opacity:.9}100%{transform:scale(1.7);opacity:0}}
+/* [PATCH] Status per All_status spec: sub-alert แสดงเป็น (i) hover tooltip แทนข้อความ */
+.info-tip{position:relative;display:inline-flex;align-items:center;margin-left:5px;color:var(--secondary);cursor:help;vertical-align:middle}
+.info-tip i{font-size:14px}
+.info-tip::after{content:attr(data-tip);position:absolute;left:50%;bottom:calc(100% + 7px);transform:translateX(-50%);background:#22262f;color:#fff;font-size:10.5px;font-weight:600;padding:6px 10px;border-radius:8px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s;box-shadow:var(--shadow-md);z-index:30}
+.info-tip::before{content:'';position:absolute;left:50%;bottom:calc(100% + 2px);transform:translateX(-50%);border:5px solid transparent;border-top-color:#22262f;opacity:0;transition:opacity .15s;z-index:30}
+.info-tip:hover::after,.info-tip:hover::before{opacity:1}
+
+.aw{display:inline-flex;align-items:center;gap:4px;height:22px;padding:0 9px;border-radius:6px;font-size:11px;font-weight:700;border:1px solid transparent;white-space:nowrap}
+.aw-wait{background:var(--blue-bg);color:var(--secondary);border-color:#c6d8f2}
+.aw-appr-wait{background:var(--blue-bg);color:var(--secondary);border-color:#c6d8f2}
+.aw-rejected{background:var(--danger-bg);color:var(--danger);border-color:var(--danger-bd)}
+.aw-awarded{background:var(--ok-bg);color:var(--ok);border-color:var(--ok-bd)}
+.aw-noaward{background:#F3F3F3;color:#7C7C7C;border-color:#E6E8EB}
+.aw-noresult{background:#F3F3F3;color:#7C7C7C;border-color:#E6E8EB}
+.aw-insufficient{background:#F3F3F3;color:#7C7C7C;border-color:#E6E8EB}
+.aw-none{background:#F3F3F3;color:#A0AAB2;border-color:#E6E8EB}
+
+.dash-scope{margin-top:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.scope-label{font-size:11px;font-weight:600;color:var(--muted);display:flex;align-items:center;gap:5px}
+.scope-label i{font-size:14px;color:var(--primary)}
+.seg{display:inline-flex;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:3px;gap:2px;box-shadow:var(--shadow-xs)}
+.seg button{height:29px;padding:0 13px;border:none;background:transparent;font-size:11.5px;font-weight:600;color:var(--muted);cursor:pointer;border-radius:7px;font-family:inherit;transition:.12s}
+.seg button.active{background:var(--primary);color:#fff}
+.seg button:hover:not(.active){background:#eef4ff;color:var(--text)}
+
+.kpi-group{margin-top:10px;display:flex;flex-direction:column;gap:14px}
+.kpi-block{flex:1;min-width:0}
+.kpi-block-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;display:flex;align-items:center;gap:5px}
+.kpi-block-label.l-purchaser{color:var(--brand-mid)}
+.kpi-block-label.l-approver{color:var(--purple-deep)}
+.kpi-cards{display:grid;gap:12px}
+.kpi-cards.n6{grid-template-columns:repeat(6,minmax(0,1fr))}
+.kpi-cards.n2{display:grid;grid-template-columns:repeat(6,minmax(0,1fr))}
+.kpi-cards.n1{grid-template-columns:1fr}
+.kpi-divider-v{width:1px;background:var(--line-2);align-self:stretch;margin:18px 2px 0}
+.gcard{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:13px 12px 11px;box-shadow:var(--shadow-xs);position:relative;overflow:hidden;cursor:pointer;transition:.16s}
+.gcard:hover{transform:translateY(-2px);box-shadow:var(--shadow-md);border-color:var(--line-2)}
+.gcard.active-card{border-color:var(--primary);box-shadow:0 0 0 2px rgba(12,86,201,.16) inset}
+.gcard.appr-card{border-color:var(--line)}
+.gcard.appr-card.active-card{box-shadow:0 0 0 2px rgba(2,123,224,.18) inset}
+.gcard .accent{position:absolute;inset:0 auto auto 0;height:3px;width:100%;background:#F27326}
+.gcard.appr-card .accent{background:#027BE0}
+.gc-top{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.gc-count{font-family:'Sarabun','Inter',sans-serif;font-size:26px;line-height:1;font-weight:700;color:var(--text)}
+.gc-badge{width:16px;height:16px;border-radius:50%;background:var(--danger);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0}
+.gc-label{font-size:12px;color:var(--text);font-weight:700;line-height:1.3;white-space:nowrap}
+.gc-label.gc-alert{color:var(--danger)}
+.gc-sub{font-size:10px;color:var(--muted);margin-top:3px;line-height:1.35}
+
+/* approver-only quick action card in KPI row */
+.qa-inline{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:11px;box-shadow:var(--shadow-xs);display:flex;align-items:center;gap:11px;cursor:pointer;transition:.16s;height:100%}
+.qa-inline:hover{transform:translateY(-2px);box-shadow:var(--shadow-md);border-color:var(--purple-bd)}
+.qa-inline .qa-ic{width:36px;height:36px}
+
+.layout{margin-top:12px;display:grid;grid-template-columns:1fr 300px;gap:12px;align-items:start}
+.layout.no-side{grid-template-columns:1fr}
+.main-col{display:flex;flex-direction:column;gap:12px;min-width:0}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow-sm);overflow:hidden}
+.card.appr-accent{border-top:1px solid var(--line)}
+.card-header{min-height:44px;padding:0 15px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:8px;background:#fafcff}
+.card-title{font-size:13px;font-weight:700;display:flex;align-items:center;gap:7px;color:var(--text)}
+.card-title i{color:var(--primary)}
+.card-title i.ap{color:var(--purple-deep)}
+.hcount{font-size:11px;font-weight:600;color:var(--muted);background:#F4F5F8;border:1px solid var(--line);padding:1px 8px;border-radius:5px}
+.af-bar{margin:12px 18px 0;display:none;align-items:center;justify-content:space-between;gap:8px;background:var(--brand-lt);border:1px solid #c6d8f2;border-radius:10px;padding:9px 13px;font-size:12px;color:var(--brand-mid);font-weight:600}
+.af-bar.show{display:flex}
+.af-bar .btn{height:26px;font-size:11px;background:var(--surface);border:1px solid #c6d8f2;color:var(--brand-mid);padding:0 10px}
+.search-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:9px 15px;border-bottom:1px solid var(--line);background:#fcfdff}
+.in{height:34px;border:1px solid var(--line);background:var(--surface);border-radius:9px;padding:0 11px;font-size:12px;color:var(--text);outline:none;font-family:inherit;transition:.15s}
+.in:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(91,135,232,.13)}
+.in-text{flex:1;min-width:140px}
+.in-field{width:150px}
+.in-date{width:135px}
+
+.table-wrap{overflow-x:auto;position:relative}
+table{width:100%;border-collapse:collapse;min-width:820px}
+thead th{text-align:left;padding:8px 12px;font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.07em;text-transform:uppercase;background:var(--bg);border-bottom:2px solid var(--line);white-space:nowrap}
+tbody tr{cursor:pointer}
+tbody td{padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:middle;font-size:12px;color:var(--text)}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:#f6f9fd}
+tbody tr.row-appr td:first-child{border-left:3px solid transparent}
+.td-mono{font-family:inherit;font-size:12px;color:var(--text);font-weight:400}
+.td-clamp{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px}
+.date-main{font-weight:600}
+.date-time{font-size:10px;color:var(--muted);font-family:'IBM Plex Mono',monospace;margin-top:2px}
+.empty-row td{text-align:center;color:var(--muted);padding:38px;font-size:13px}
+.empty-row td:first-child{border-left:3px solid transparent}
+.loading-overlay{position:absolute;inset:0;background:rgba(255,255,255,.72);display:none;align-items:center;justify-content:center;z-index:5;font-size:12px;color:var(--muted);gap:8px}
+.loading-overlay.show{display:flex}
+.col-creator.hide-col{display:none}
+
+.ap-type{display:inline-flex;align-items:center;gap:4px;height:22px;padding:0 9px;border-radius:6px;font-size:11px;font-weight:700;border:1px solid transparent;white-space:nowrap}
+.ap-setup{background:var(--blue-bg);color:var(--blue);border-color:var(--blue-bd)}
+.ap-result{background:var(--ok-bg);color:var(--ok);border-color:var(--ok-bd)}
+.ap-type-txt{font-size:12.5px;font-weight:400;color:var(--text)}
+.ap-go{color:var(--purple-deep);font-size:15px}
+.td-id{font-weight:400;color:var(--text);font-size:12.5px}
+.ap-res-ok{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-bd);padding:2px 8px;border-radius:5px;font-size:11px;font-weight:700}
+.ap-res-rej{background:var(--orange-bg);color:var(--orange);border:1px solid var(--orange-bd);padding:2px 8px;border-radius:5px;font-size:11px;font-weight:700}
+
+.pagination{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 15px;border-top:1px solid var(--line);background:#fcfdff;flex-wrap:wrap}
+.pg-info{font-size:11px;color:var(--muted)}
+.pg-info strong{color:var(--text)}
+.pg-btns{display:flex;gap:4px;align-items:center}
+.pg-btn{height:29px;min-width:29px;padding:0 8px;border-radius:8px;border:1px solid var(--line);background:var(--surface);font-size:11px;font-weight:600;color:var(--text);cursor:pointer;transition:.12s;display:inline-flex;align-items:center;justify-content:center;font-family:inherit}
+.pg-btn:hover{background:#eef4ff}
+.pg-btn.active{background:var(--primary);border-color:var(--primary);color:#fff}
+.pg-btn:disabled{opacity:.35;cursor:not-allowed}
+.pg-ellipsis{font-size:12px;color:var(--muted);padding:0 4px}
+
+.side{display:flex;flex-direction:column;gap:12px}
+.side-card{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow-sm);overflow:hidden}
+.side-card.appr-accent{border-top:3px solid var(--purple)}
+.side-h{padding:12px 14px;border-bottom:1px solid var(--line);background:var(--surface);display:flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.04em}
+.side-h i{color:var(--primary)}
+.side-h i.ap{color:var(--purple-deep)}
+.side-body{padding:9px}
+
+.qa-item{display:flex;align-items:center;gap:12px;padding:12px 4px;border-radius:0;border:none;border-bottom:1px solid var(--line);cursor:pointer;transition:.14s;margin-bottom:0}
+.qa-item:last-child{margin-bottom:0;border-bottom:none}
+.qa-item:hover{background:#fafcff}
+.qa-item.qa-all{background:var(--surface)}
+.qa-item.qa-complete{background:var(--surface)}
+.qa-item.qa-cancel{background:var(--surface)}
+.qa-item.qa-history{background:var(--surface)}
+.qa-ic{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0}
+.qa-ic-all{background:var(--brand-lt);color:var(--primary)}
+.qa-ic-complete{background:var(--ok-bg);color:var(--ok)}
+.qa-ic-cancel{background:var(--bg);color:var(--muted)}
+.qa-ic-history{background:var(--purple-bg);color:var(--purple-deep)}
+.qa-meta{flex:1;min-width:0}
+.qa-title{font-size:12px;font-weight:700;color:var(--text)}
+.qa-desc{font-size:10px;color:var(--muted);margin-top:1px}
+.qa-num{font-family:'IBM Plex Mono',monospace;font-size:21px;font-weight:700;line-height:1}
+.qa-num-all{color:var(--primary)}
+.qa-num-complete{color:var(--teal)}
+.qa-num-cancel{color:#7C7C7C}
+.qa-num-history{color:var(--purple-deep)}
+.qa-arrow{color:var(--line-2);font-size:16px}
+
+.up-item{display:flex;gap:10px;padding:11px;border-radius:12px;cursor:pointer;transition:.12s;border:1px solid transparent}
+.up-item:hover{background:#f2f7fd;border-color:var(--line)}
+.up-day{width:44px;flex-shrink:0;text-align:center;border-radius:10px;padding:6px 2px}
+.up-day.d-live{background:var(--ok-bg);border:1px solid var(--ok-bd)}
+.up-day.d-sched{background:var(--blue-bg);border:1px solid var(--blue-bd)}
+.up-day .d{font-size:16px;font-weight:700;line-height:1;font-family:'IBM Plex Mono',monospace}
+.up-day .m{font-size:8.5px;font-weight:700;text-transform:uppercase;margin-top:2px}
+.d-live .d,.d-live .m{color:var(--ok)}
+.d-sched .d,.d-sched .m{color:var(--blue)}
+.up-info{flex:1;min-width:0}
+.up-name{font-size:12px;font-weight:700;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.up-sub{font-size:10px;color:var(--muted);margin-top:2px;font-family:'IBM Plex Mono',monospace}
+.up-tag{font-size:11px;font-weight:600;display:inline-flex;align-items:center;gap:5px;margin-top:5px}
+.up-tag-live{color:var(--ok)}
+.up-tag-sched{color:var(--muted)}
+.up-tag-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;display:inline-block}
+.side-empty{padding:20px;text-align:center;font-size:11px;color:var(--muted)}
+
+.analytics{margin-top:18px}
+.an-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.an-title{font-size:16px;font-weight:700;display:flex;align-items:center;gap:9px;color:var(--text)}
+.an-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.an-viewseg{display:inline-flex;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:3px;gap:2px;box-shadow:var(--shadow-xs)}
+.an-viewseg button{height:30px;padding:0 14px;border:none;background:transparent;font-size:11.5px;font-weight:600;color:var(--muted);cursor:pointer;border-radius:7px;font-family:inherit;transition:.12s;display:inline-flex;align-items:center;gap:6px}
+.an-viewseg button.active[data-view="created"]{background:var(--primary);color:#fff}
+.an-viewseg button.active[data-view="approved"]{background:var(--purple);color:#fff}
+.an-viewseg button:hover:not(.active){background:#eef4ff;color:var(--text)}
+
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:var(--shadow-sm);position:relative;overflow:hidden}
+.kpi-ic{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:13px;color:#fff}
+.kpi-val{font-family:'IBM Plex Mono',monospace;font-size:26px;font-weight:700;line-height:1;color:var(--text)}
+.kpi-unit{font-size:13px;font-weight:600;color:var(--muted);margin-left:2px}
+.kpi-label{font-size:11px;color:var(--muted);font-weight:600;margin-top:8px}
+.kpi-delta{font-size:10.5px;font-weight:700;margin-top:7px;display:inline-flex;align-items:center;gap:3px}
+.delta-up{color:var(--ok)}.delta-down{color:var(--danger)}
+
+.chart-grid{display:grid;grid-template-columns:1.6fr 1fr;gap:10px;margin-bottom:10px}
+.chart-card{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow-sm);overflow:hidden}
+.chart-h{padding:11px 15px;border-bottom:1px solid var(--line);background:#fafcff;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.chart-h .t{font-size:12.5px;font-weight:700;display:flex;align-items:center;gap:7px}
+.chart-h .t i{font-size:16px}
+.chart-h .sub{font-size:10px;color:var(--muted);font-weight:500}
+.chart-body{padding:13px 15px;position:relative}
+.chart-box{position:relative;height:300px}
+.chart-box.sm{height:280px}
+.legend-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;justify-content:center}
+.lg-chip{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:600;color:var(--muted)}
+.lg-dot{width:9px;height:9px;border-radius:3px;flex-shrink:0}
+
+.overlay{display:none;position:fixed;inset:0;background:rgba(40,60,100,.42);z-index:300;align-items:center;justify-content:center;padding:22px;backdrop-filter:blur(4px)}
+.overlay.open{display:flex}
+.modal{width:100%;max-width:760px;max-height:88vh;overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow-lg)}
+.modal-header{position:sticky;top:0;z-index:1;background:var(--surface);border-bottom:1px solid var(--line);min-height:58px;padding:0 18px;display:flex;align-items:center;justify-content:space-between}
+.modal-title{font-size:14px;font-weight:700;color:var(--text)}
+.modal-body{padding:18px;display:flex;flex-direction:column;gap:18px}
+.modal-actions{display:flex;justify-content:flex-end;gap:8px;padding-top:4px}
+.modal .btn{background:var(--surface);border:1px solid var(--line);color:var(--text)}
+.btn-primary{background:var(--primary);border-color:var(--primary);color:#fff}
+.modal .btn-primary{background:var(--primary);border-color:var(--primary);color:#fff}
+.qa-send-btn{background:var(--primary-deep);border-color:var(--primary-deep);color:#fff}
+.modal .qa-send-btn{background:var(--primary-deep);border-color:var(--primary-deep);color:#fff}
+.modal .btn-purple{background:var(--purple);border-color:var(--purple);color:#fff}
+.modal .btn-icon{width:33px;height:33px;background:var(--surface);border:1px solid var(--line);color:var(--text);border-radius:9px}
+.qa-modal-sub{font-size:11px;color:var(--muted);margin-top:-4px}
+.mini-q{border:1px solid var(--line);border-radius:14px;padding:18px;background:var(--surface)}
+.mini-q-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.mini-q-user{font-size:11px;font-weight:700;padding:3px 10px;border-radius:7px;background:#EEF2FF;border:none;color:#0E50BD}
+.mini-q-text{font-size:13.5px;line-height:1.6;color:var(--text);margin-top:12px;font-weight:600}
+.mini-q-ans{font-size:12.5px;line-height:1.55;color:#0E50BD;margin-top:10px;background:#EEF2FF;border:none;border-radius:10px;padding:10px 13px;font-weight:600;display:flex;align-items:center;gap:6px}
+.mini-q-ans i{font-size:15px;flex-shrink:0;color:#0E50BD}
+.mini-q-editor{margin-top:10px;border:1px solid transparent;border-radius:10px;background:#F4F5F8;padding:14px;min-height:60px;font-size:12.5px;outline:none}
+.mini-q-editor:empty:before{content:attr(data-placeholder);color:var(--muted)}
+.mini-q-time{font-size:10px;color:var(--muted)}
+.mini-q-editor:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(91,135,232,.13);background:var(--surface)}
+.btn-sm{height:31px;padding:0 11px;font-size:11px}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.d-box{border:1px solid var(--line);border-radius:10px;background:#fbfcfe;padding:11px}
+.d-key{font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.d-val{font-size:12px;font-weight:700;margin-top:3px;color:var(--text)}
+.timeline-box{border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.t-row{font-size:11px;padding:10px 13px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:10px;background:var(--surface)}
+.t-row:last-child{border-bottom:none}
+.t-left{color:var(--muted)}.t-right{font-weight:700;color:var(--text)}
+
+.toast{position:fixed;right:22px;bottom:22px;z-index:999;background:#004a9e;color:#eef4ff;border:1px solid #0a7ec0;border-radius:12px;padding:11px 17px;font-size:12px;display:flex;gap:8px;align-items:center;transform:translateY(60px);opacity:0;transition:.25s;pointer-events:none;box-shadow:0 10px 28px rgba(0,40,80,.24)}
+.toast.show{transform:translateY(0);opacity:1}
+.toast i{color:#1EF393}
+@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+
+.hidden{display:none!important}
+@media(max-width:1180px){
+  .kpi-group{flex-direction:column}
+  .kpi-divider-v{display:none;width:auto;height:1px;margin:4px 0}
+  .kpi-cards.n6,.kpi-cards.n2{grid-template-columns:repeat(4,minmax(0,1fr))}
+}
+@media(max-width:1100px){
+  .layout{grid-template-columns:1fr}
+  .side{flex-direction:row;flex-wrap:wrap}
+  .side-card{flex:1;min-width:280px}
+  .chart-grid{grid-template-columns:1fr}
+  .kpi-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:680px){
+  .kpi-cards.n6,.kpi-cards.n2{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .kpi-grid{grid-template-columns:1fr}
+  .side{flex-direction:column}
+  .search-bar{flex-direction:column}
+  .in-text,.in-field,.in-date{width:100%}
+  .detail-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar-wrap">
+  <div class="container topbar">
+    <div class="topbar-left">
+      <div class="brand-mark">EP <span class="brand-one">One</span></div>
+      <div class="app-name">eAuction</div>
+      <nav class="tb-nav">
+        <button class="tb-nav-tab active" type="button">Overview</button>
+        <button class="tb-nav-tab" type="button" onclick="showToast('หน้านี้ยังไม่เปิดใช้งานในเดโม')">Page 2</button>
+      </nav>
+    </div>
+    <div class="topbar-right">
+      <div class="user-switch">
+        <span class="lbl">Demo</span>
+        <select id="userSelect" onchange="switchUser(this.value)">
+          <option value="somchai">Somchai K. · Purchaser + Approver</option>
+          <option value="wipa">Wipa R. · Purchaser only</option>
+          <option value="manee">Manee P. · Approver only</option>
+        </select>
+      </div>
+      <div class="dd-wrap">
+        <button class="tb-icon-btn" onclick="toggleDd('ddQa')"><i class="ti ti-message-circle"></i><span class="tb-badge" id="tbQaCount">0</span></button>
+        <div class="tb-dropdown" id="ddQa"><div class="tb-dd-header">Q&A Board</div><div id="ddQaList"></div></div>
+      </div>
+      <div class="dd-wrap">
+        <button class="tb-icon-btn" onclick="toggleDd('ddNotif')"><i class="ti ti-bell"></i><span class="notif-dot" id="notifDot"></span></button>
+        <div class="tb-dropdown" id="ddNotif" style="width:380px">
+          <div class="tb-dd-header-flex"><span class="t"><i class="ti ti-bell"></i> การแจ้งเตือนล่าสุด</span><span class="tb-dd-mark" onclick="markAllRead()">Mark all as read</span></div>
+          <div class="notif-tabs" id="notifTabs"></div>
+          <div id="notifList" style="max-height:360px;overflow:auto"></div>
+        </div>
+      </div>
+      <div class="tb-vdiv"></div>
+      <button class="tb-help-btn" onclick="showToast('เอกสารช่วยเหลือยังไม่เปิดใช้งานในเดโม')">Help</button>
+      <div class="avatar" id="tbAvatar">SK</div>
+    </div>
+  </div>
+</div>
+
+<div class="action-bar">
+  <div class="action-bar-inner">
+    <div class="role-badges" id="roleBadges"></div>
+    <div class="action-right" id="actionRight"></div>
+  </div>
+</div>
+
+<div class="container" id="dashView">
+  <div class="dash-scope">
+    <span class="scope-label"><i class="ti ti-filter"></i> ขอบเขตข้อมูล:</span>
+    <div class="seg" id="scopeSeg">
+      <button data-scope="team" onclick="setScope('team')">ทั้งหมด</button>
+      <button class="active" data-scope="mine" onclick="setScope('mine')">งานของฉัน</button>
+    </div>
+  </div>
+
+  <div class="kpi-group" id="kpiGroup"></div>
+  <div id="approvalWidgetSlot"></div>
+
+  <div class="layout" id="layoutRow">
+    <div class="main-col" id="mainCol"></div>
+    <div class="side" id="sideCol"></div>
+  </div>
+
+  <div class="analytics" id="analyticsSlot"></div>
+</div>
+
+<div class="container" id="listView" style="display:none">
+  <div style="display:flex;align-items:center;gap:12px;margin:20px 0 4px">
+    <button class="btn btn-ghost" onclick="backToDash()" style="height:38px"><i class="ti ti-arrow-left"></i> กลับ Dashboard</button>
+    <div class="card-title" id="lvTitle" style="font-size:17px"></div>
+    <span class="hcount" id="lvBadge"></span>
+  </div>
+  <div class="card" style="margin-top:12px">
+    <div class="search-bar" id="lvSearchBar"></div>
+    <div class="table-wrap">
+      <div class="loading-overlay" id="loadList"><i class="ti ti-loader-2" style="animation:spin 1s linear infinite"></i> กำลังโหลด...</div>
+      <table><thead id="lvHead"></thead><tbody id="lvTb"></tbody></table>
+    </div>
+    <div class="pagination"><div class="pg-info" id="lvPgInfo"></div><div class="pg-btns" id="lvPgBtns"></div></div>
+  </div>
+</div>
+
+<div class="overlay" id="qaModal" onclick="closeIfOverlay(event,'qaModal')">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title"><i class="ti ti-message-circle" style="color:var(--primary);margin-right:6px"></i> Q&amp;A — <span id="qaModalTitle"></span></div><button class="btn-icon" onclick="closeModal('qaModal')"><i class="ti ti-x"></i></button></div>
+    <div class="modal-body" id="qaModalBody"></div>
+  </div>
+</div>
+
+<div class="overlay" id="detailModal" onclick="closeIfOverlay(event,'detailModal')">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title"><i class="ti ti-file-info" style="color:var(--primary);margin-right:6px"></i> รายละเอียด — <span id="detailTitle"></span></div><button class="btn-icon" onclick="closeModal('detailModal')"><i class="ti ti-x"></i></button></div>
+    <div class="modal-body">
+      <div class="detail-grid" id="detailGrid"></div>
+      <div><div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">Activity Timeline</div><div class="timeline-box" id="detailTimeline"></div></div>
+      <div class="modal-actions"><button class="btn" onclick="closeModal('detailModal')">ปิด</button><button class="btn btn-primary" onclick="showToast('เปิดหน้ารายละเอียดเต็ม...')"><i class="ti ti-external-link"></i> เปิดหน้าเต็ม</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><i class="ti ti-check"></i><span id="toastMsg"></span></div>
+
+<script>
+const PAGE_SIZE=5;
+function dtShift(m){const d=new Date(Date.now()+m*60000);const p=n=>String(n).padStart(2,'0');return`${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;}
+const formats=['English','English (Multi)','Sealed','Sealed (Multi)','MVB'];
+const creators=['Somchai K.','Wipa R.','Nattapong T.','Suda C.','Anucha M.','Pranee S.','Krit W.'];
+const nouns=['PPE Supply','Bearing Lot','Chemical Solvent','Boiler Tube','Packaging Film','IT Hardware','Forklift Maint.','Cooling Tower Chem','Scrap Metal','Lubricant Bulk','Safety Equipment','Pump Procurement','Network Infra','Conveyor Belt','Generator Fuel','Steam Turbine','Racking System','Office Furniture','Used Oil','Corn Byproduct'];
+
+const USERS={
+  somchai:{name:'Somchai K.',initials:'SK',roles:['purchaser','approver']},
+  wipa:{name:'Wipa R.',initials:'WR',roles:['purchaser']},
+  manee:{name:'Manee P.',initials:'MN',roles:['approver']}
+};
+let currentUserKey='somchai';
+function CU(){return USERS[currentUserKey];}
+function ME(){return CU().name;}
+function hasRole(r){return CU().roles.includes(r);}
+/* [MOCK] ผู้อนุมัติหลักในเดโมนี้คือ Manee P. — เมื่อผู้ใช้เดโมมี role approver (ไม่ว่าจะเป็น Somchai แบบ Purchaser+Approver หรือ Manee แบบ Approver only) ให้จับคู่งานอนุมัติ mock ทั้งหมดมาที่ตัวเอง เพื่อให้เดโมเห็นข้อมูลจริง */
+function AP_ME(){return hasRole('approver')?'Manee P.':ME();}
+
+const fixed=[
+  {auctionId:'EA-2026-0130',format:'English (Multi)',type:'Reverse',name:'Steam Turbine Overhaul 2026',status:'Active',auctionStart:dtShift(-30),auctionEnd:dtShift(90),award:'none',creator:'Somchai K.',budget:8.5,winning:null,bidders:6,approvalFlow:{setup:{approver:'Manee P.',state:'approved'},result:{approver:'Manee P.',state:'not-yet'}}},
+  {auctionId:'EA-2026-0131',format:'Sealed',type:'Reverse',name:'Annual Bearing Supply 2026',status:'Active',auctionStart:dtShift(-5),auctionEnd:dtShift(25),award:'none',creator:'Wipa R.',budget:3.2,winning:null,bidders:5,approvalFlow:{setup:{approver:'Manee P.',state:'approved'},result:{approver:'Manee P.',state:'not-yet'}}},
+  {auctionId:'EA-2026-0134',format:'English (Multi)',type:'Reverse',name:'Safety Equipment Bulk 2026',status:'Active',auctionStart:dtShift(180),auctionEnd:dtShift(300),award:'none',creator:'Somchai K.',budget:3.6,winning:null,bidders:0,approvalFlow:{setup:{approver:'Manee P.',state:'approved'},result:{approver:'Manee P.',state:'not-yet'}}},
+  {auctionId:'EA-2026-0135',format:'Sealed',type:'Reverse',name:'Pump Procurement Q1 2026',status:'Active',auctionStart:dtShift(1440),auctionEnd:dtShift(1560),award:'none',creator:'Somchai K.',budget:5.8,winning:null,bidders:0,approvalFlow:{setup:{approver:'Manee P.',state:'approved'},result:{approver:'Manee P.',state:'not-yet'}}},
+  {auctionId:'EA-2025-0107',format:'English (Multi)',type:'Reverse',name:'Compressed Air System MRO',status:'Active',auctionStart:'2025-10-25T10:00',auctionEnd:'2025-10-25T12:00',award:'awaiting-approval',creator:'Somchai K.',budget:6.3,winning:5.4,bidders:5,approvalFlow:{setup:{approver:'Manee P.',state:'approved'},result:{approver:'Manee P.',state:'pending',requestedAt:'2025-10-20'}}},
+  {auctionId:'EA-2025-0118',format:'English',type:'Reverse',name:'Boiler Tube Replacement Q4',status:'PTVN Review',auctionStart:'2025-12-28T10:00',auctionEnd:'2025-12-28T12:00',award:'none',creator:'Somchai K.',infoRequest:'Commercial ขอ spec เพิ่มเติม — Due 2025-12-30',budget:4.5,winning:null,bidders:0,approvalFlow:{setup:{approver:'Manee P.',state:'approved'},result:{approver:'Manee P.',state:'not-yet'}}},
+  {auctionId:'EA-2025-0112',format:'MVB',type:'Reverse',name:'Packaging Film Q4 Contract',status:'PTVN Review',auctionStart:'2025-12-20T10:00',auctionEnd:'2025-12-20T12:00',award:'none',creator:'Nattapong T.',infoRequest:'Overdue: Commercial รอ TDS ตั้งแต่ 2025-12-08',overdue:true,budget:5.5,winning:null,bidders:0,approvalFlow:{setup:{approver:'Manee P.',state:'approved'},result:{approver:'Manee P.',state:'not-yet'}}},
+  {auctionId:'EA-2025-0117',format:'Sealed',type:'Reverse',name:'Forklift Fleet Maintenance 2H',status:'Awaiting Approval',auctionStart:'2025-12-22T10:00',auctionEnd:'2025-12-22T12:00',award:'none',creator:'Somchai K.',budget:7.2,winning:null,bidders:0,approvalFlow:{setup:{approver:'Manee P.',state:'pending',requestedAt:'2025-12-17'},result:{approver:'Manee P.',state:'not-yet'}}},
+  {auctionId:'EA-2025-0114',format:'English (Multi)',type:'Reverse',name:'IT Network Infrastructure',status:'Awaiting Approval',auctionStart:'2025-12-18T14:00',auctionEnd:'2025-12-18T16:00',award:'none',creator:'Suda C.',budget:9.8,winning:null,bidders:0,approvalFlow:{setup:{approver:'Manee P.',state:'pending',requestedAt:'2025-12-14'},result:{approver:'Manee P.',state:'not-yet'}}},
+  {auctionId:'EA-2025-0121',format:'Sealed (Multi)',type:'Reverse',name:'Valve Replacement Program',status:'Active',auctionStart:'2025-11-26T10:00',auctionEnd:'2025-11-26T12:00',award:'awaiting-approval',creator:'Wipa R.',budget:3.7,winning:3.3,bidders:4,approvalFlow:{setup:{approver:'Manee P.',state:'approved'},result:{approver:'Manee P.',state:'pending',requestedAt:'2025-11-22'}}},
+  {auctionId:'EA-2025-0119',format:'English',type:'Reverse',name:'Hydraulic Pump Set Q4',status:'Active',auctionStart:'2025-11-30T10:00',auctionEnd:'2025-11-30T12:00',award:'rejected',creator:'Somchai K.',rejectNote:'ราคาผู้ชนะสูงกว่ารายที่ 2',budget:5.2,winning:4.9,bidders:5,approvalFlow:{setup:{approver:'Manee P.',state:'approved'},result:{approver:'Manee P.',state:'rejected'}}},
+  {auctionId:'EA-2025-0116',format:'Sealed',type:'Reverse',name:'Office Furniture 2026 Plan',status:'Draft',auctionStart:'2025-12-01T10:00',auctionEnd:'2025-12-01T12:00',award:'none',creator:'Somchai K.',budget:1.8,winning:null,bidders:0,approvalFlow:{setup:{approver:'Manee P.',state:'not-yet'},result:{approver:'Manee P.',state:'not-yet'}}},
+  {auctionId:'EA-2025-0100',format:'English (Multi)',type:'Reverse',name:'Conveyor Belt Replacement',status:'Rejected by Approver',auctionStart:'2025-07-10T10:00',auctionEnd:'2025-07-10T12:00',award:'none',creator:'Somchai K.',budget:4.2,winning:null,bidders:0,approvalFlow:{setup:{approver:'Manee P.',state:'rejected'},result:{approver:'Manee P.',state:'not-yet'}}},
+  {auctionId:'EA-2025-0122',format:'Sealed',type:'Reverse',name:'Cooling Tower Chemical Q1',status:'PTVN Review',auctionStart:'2025-12-26T10:00',auctionEnd:'2025-12-26T12:00',award:'none',creator:'Suda C.',budget:2.6,winning:null,bidders:0,approvalFlow:{setup:{approver:'Manee P.',state:'approved'},result:{approver:'Manee P.',state:'not-yet'}}},
+  {auctionId:'EA-2025-0123',format:'English',type:'Reverse',name:'Scrap Metal Disposal Q4',status:'Rejected by PTVN',auctionStart:'2025-11-05T10:00',auctionEnd:'2025-11-05T12:00',award:'none',creator:'Anucha M.',budget:1.4,winning:null,bidders:0,approvalFlow:{setup:{approver:'Manee P.',state:'approved'},result:{approver:'Manee P.',state:'not-yet'}}},
+  {auctionId:'EA-2025-0124',format:'Sealed (Multi)',type:'Reverse',name:'Racking System Expansion',status:'Cancelled',auctionStart:'2025-08-12T10:00',auctionEnd:'2025-08-12T12:00',award:'insufficient',creator:'Somchai K.',budget:2.9,winning:null,bidders:2},
+  {auctionId:'EA-2025-0125',format:'English',type:'Reverse',name:'Generator Fuel Contract 2026',status:'Awaiting Approval',auctionStart:'2025-12-30T10:00',auctionEnd:'2025-12-30T12:00',award:'none',creator:'Pranee S.',budget:6.6,winning:null,bidders:0,approvalFlow:{setup:{approver:'Manee P.',state:'pending',requestedAt:'2025-12-26'},result:{approver:'Manee P.',state:'not-yet'}}},
+  {auctionId:'EA-2025-0126',format:'MVB',type:'Reverse',name:'Network Infra Upgrade 2H',status:'Active',auctionStart:'2025-11-10T10:00',auctionEnd:'2025-11-10T12:00',award:'awaiting-approval',creator:'Krit W.',budget:4.4,winning:3.9,bidders:6,approvalFlow:{setup:{approver:'Manee P.',state:'approved'},result:{approver:'Manee P.',state:'pending',requestedAt:'2025-11-05'}}},
+  {auctionId:'EA-2026-0140',format:'English',type:'Reverse',name:'Chemical Solvent Bulk 2026',status:'Active',auctionStart:dtShift(2880),auctionEnd:dtShift(3000),award:'none',creator:'Somchai K.',budget:2.4,winning:null,bidders:0,approvalFlow:{setup:{approver:'Manee P.',state:'approved'},result:{approver:'Manee P.',state:'not-yet'}}},
+  {auctionId:'EA-2025-0105',format:'English',type:'Reverse',name:'Lubricant Bulk Supply H1',status:'Active',auctionStart:'2025-11-15T10:00',auctionEnd:'2025-11-15T12:00',award:'waiting',creator:'Somchai K.',budget:2.8,winning:null,bidders:4,approvalFlow:{setup:{approver:'Manee P.',state:'approved'},result:{approver:'Manee P.',state:'not-yet'}}},
+  {auctionId:'EA-2025-0090',format:'Sealed',type:'Reverse',name:'Spare Parts Lot 2025',status:'Cancelled',auctionStart:'2025-09-15T10:00',auctionEnd:'2025-09-15T12:00',award:'no-result',creator:'Somchai K.',budget:2.1,winning:null,bidders:0},
+  {auctionId:'EA-2025-0088',format:'MVB',type:'Reverse',name:'Cleaning Service Annual',status:'Cancelled',auctionStart:'2025-09-05T10:00',auctionEnd:'2025-09-05T12:00',award:'no-award',creator:'Somchai K.',budget:4.0,winning:null,bidders:5},
+  {auctionId:'EA-2025-0087',format:'Sealed',type:'Reverse',name:'Catering Supply Q3',status:'Cancelled',auctionStart:'2025-08-28T10:00',auctionEnd:'2025-08-28T12:00',award:'none',creator:'Somchai K.',manualCancel:true,cancelNote:'ยกเลิกตามคำสั่งผู้บริหาร',budget:1.5,winning:null,bidders:0}
+];
+function genHistory(){
+  const arr=[];let n=86;const now=new Date();
+  for(let mAgo=0;mAgo<14;mAgo++){
+    const per=4+Math.floor(Math.random()*5);
+    for(let i=0;i<per;i++){
+      const d=new Date(now.getFullYear(),now.getMonth()-mAgo,1+Math.floor(Math.random()*27),10,0);const y=d.getFullYear();
+      let status,award,winning,bidders,manualCancel=false,budget=+(1.5+Math.random()*10).toFixed(1);
+      const r=Math.random();
+      if(r<0.08){status='Cancelled';award='none';winning=null;bidders=Math.floor(Math.random()*4);manualCancel=true;}
+      else if(r<0.16){status='Cancelled';award='no-result';winning=null;bidders=0;}
+      else if(r<0.24){status='Cancelled';award='insufficient';winning=null;bidders=1+Math.floor(Math.random()*2);}
+      else if(r<0.30){status='Cancelled';award='no-award';winning=null;bidders=3+Math.floor(Math.random()*4);}
+      else if(r<0.36){status='Active';award='rejected';bidders=3+Math.floor(Math.random()*5);winning=+(budget*(0.8+Math.random()*0.14)).toFixed(1);}
+      else{status='Complete';award='awarded';bidders=3+Math.floor(Math.random()*6);winning=+(budget*(0.78+Math.random()*0.16)).toFixed(1);}
+      const p=x=>String(x).padStart(2,'0');const ds=`${y}-${p(d.getMonth()+1)}-${p(d.getDate())}`;
+      const cr=creators[Math.floor(Math.random()*creators.length)];
+      const apprState=(status==='Complete'||award==='awarded')?'approved':(award==='rejected'?'rejected':'approved');
+      arr.push({auctionId:`EA-${y}-${String(n).padStart(4,'0')}`,format:formats[Math.floor(Math.random()*formats.length)],type:Math.random()<0.25?'Forward':'Reverse',name:`${nouns[Math.floor(Math.random()*nouns.length)]} ${y}`,status,auctionStart:`${ds}T10:00`,auctionEnd:`${ds}T12:00`,award,creator:cr,manualCancel,cancelNote:manualCancel?'ยกเลิกโดยผู้ใช้':null,budget,winning,bidders,approvalFlow:status==='Cancelled'?undefined:{setup:{approver:'Manee P.',state:'approved',at:`${ds}`},result:{approver:'Manee P.',state:apprState==='rejected'?'rejected':(status==='Complete'?'approved':'not-yet'),at:`${ds}`}}});
+      n--;if(n<1)n=999;
+    }
+  }
+  return arr;
+}
+const auctions=[...fixed,...genHistory()];
+
+const approvalHistory=(()=>{
+  const out=[];
+  auctions.forEach(a=>{
+    if(!a.approvalFlow)return;
+    if(a.approvalFlow.setup?.state==='approved')out.push({auctionId:a.auctionId,name:a.name,type:'setup',result:'approved',at:a.approvalFlow.setup.at||'2025-11-15',budget:a.budget});
+    if(a.approvalFlow.setup?.state==='rejected')out.push({auctionId:a.auctionId,name:a.name,type:'setup',result:'rejected',at:'2025-10-20',budget:a.budget});
+    if(a.approvalFlow.result?.state==='approved')out.push({auctionId:a.auctionId,name:a.name,type:'result',result:'approved',at:a.approvalFlow.result.at||'2025-11-18',budget:a.budget,winning:a.winning});
+    if(a.approvalFlow.result?.state==='rejected')out.push({auctionId:a.auctionId,name:a.name,type:'result',result:'rejected',at:'2025-11-20',budget:a.budget,winning:a.winning});
+  });
+  return out.slice(0,60);
+})();
+
+const qaData={
+  'EA-2025-0118':[{id:'Q1',q:'ขอ spec Bearing NTN 6205 เพิ่มเติมได้ไหมครับ?',t:'วันนี้ 10:42',a:null},{id:'Q2',q:'Delivery lead time ขั้นต่ำคืออะไร?',t:'วันนี้ 09:18',a:'Lead time 10 วันทำการ'}],
+  'EA-2026-0130':[{id:'Q1',q:'Turbine model ที่รองรับมีอะไรบ้าง?',t:'วันนี้ 11:20',a:null}],
+  'EA-2026-0140':[{id:'Q1',q:'ขอราคาต่อหน่วยแยกตามเกรดของสารเคมีได้ไหมครับ?',t:'วันนี้ 08:05',a:null},{id:'Q2',q:'รับ MSDS ภาษาไทยไหมครับ?',t:'เมื่อวาน 16:40',a:null}]
+};
+function auctionName(no){const a=auctions.find(x=>x.auctionId===no);return a?a.name:no;}
+
+/* ===== NOTIFICATIONS ===== */
+let notifFilter='all';
+const notifications=[
+  {ini:'Pr',text:'Your Purchase Request was approved. Please check your tasks.',time:'1 week ago',read:false},
+  {ini:'Pr',text:'Your Purchase Request was approved. Please check your tasks.',time:'1 week ago',read:false},
+  {ini:'Pr',text:'Your Purchase Request was approved. Please check your tasks.',time:'1 week ago',read:false},
+  {ini:'JR',text:'The new PR is awaiting approval',time:'1 week ago',read:false},
+  {ini:'JR',text:'The new PR is awaiting approval',time:'1 week ago',read:false}
+];
+function unreadCount(){return notifications.filter(n=>!n.read).length;}
+function setNotifFilter(f){notifFilter=f;renderNotif();}
+function markAllRead(){notifications.forEach(n=>n.read=true);renderNotif();}
+function renderNotif(){
+  const tabs=document.getElementById('notifTabs');if(!tabs)return;
+  const u=unreadCount();
+  tabs.innerHTML=`<button class="notif-tab ${notifFilter==='all'?'active':''}" onclick="setNotifFilter('all')">All</button><button class="notif-tab ${notifFilter==='unread'?'active':''}" onclick="setNotifFilter('unread')">Unread <span class="cnt cnt-blue" style="margin-left:2px">${u}</span></button>`;
+  const list=notifFilter==='unread'?notifications.filter(n=>!n.read):notifications;
+  const listEl=document.getElementById('notifList');
+  listEl.innerHTML=list.length?list.map(n=>`<div class="notif-item ${n.read?'':'unread'}"><div class="notif-dot-ind" style="background:${n.read?'#3B444F':'var(--primary)'}"></div><div class="notif-ava">${n.ini}</div><div class="notif-body"><div class="notif-text">${n.text}</div><div class="notif-time">${n.time}</div></div></div>`).join(''):`<div style="padding:24px;text-align:center;font-size:12px;color:var(--muted)">ไม่มีการแจ้งเตือน</div>`;
+  const dot=document.getElementById('notifDot');if(dot)dot.style.display=u>0?'block':'none';
+}
+
+const awardMap={'none':{cls:'aw-none',ic:'ti-minus',txt:'—'},'waiting':{cls:'aw-wait',ic:'ti-user-exclamation',txt:'Awaiting Winner'},'awaiting-approval':{cls:'aw-appr-wait',ic:'ti-clock',txt:'Awaiting Approval'},'rejected':{cls:'aw-rejected',ic:'ti-gavel',txt:'Award Rejected'},'awarded':{cls:'aw-awarded',ic:'ti-trophy',txt:'Awarded'},'no-award':{cls:'aw-noaward',ic:'ti-user-off',txt:'No Award'},'no-result':{cls:'aw-noresult',ic:'ti-circle-off',txt:'No Result'},'insufficient':{cls:'aw-insufficient',ic:'ti-users-minus',txt:'Insufficient Bidders'}};
+function awardChip(a){if(a.status==='Cancelled'&&a.manualCancel)return`<span class="aw aw-none">—</span>`;const m=awardMap[a.award]||awardMap['none'];return`<span class="aw ${m.cls}">${m.txt}</span>`;}
+function auctionPhase(a){if(a.status!=='Active')return 'n/a';if(a.award==='rejected')return 'n/a';const now=new Date(),s=new Date(a.auctionStart),e=new Date(a.auctionEnd);if(now<s)return 'scheduled';if(now>=s&&now<e)return 'live';return 'ended';}
+/* [PATCH 2] Award Rejected → Closed */
+function displayStatus(a){if(a.award==='rejected')return 'Closed';if(a.status==='Active'&&auctionPhase(a)==='ended')return 'Closed';return a.status;}
+function hasInfoRequest(a){return a.infoRequest&&a.status==='PTVN Review';}
+/* [MOCK] Q&A Board เปิดเฉพาะช่วงหลังส่งงานให้ supplier (PTVN review ผ่านแล้ว) จนถึงก่อนเปิดประมูล (ยังไม่ Live) — ปิดบอร์ดทันทีที่เข้าสถานะ Live */
+function qaBoardOpen(a){return a.status==='Active'&&auctionPhase(a)!=='live';}
+function hasQaPending(a){if(!qaBoardOpen(a))return false;const l=qaData[a.auctionId];return !!(l&&l.some(x=>!x.a));}
+function actionType(a){if(a.status==='Active'&&a.award==='rejected')return 'Award Rejected';if(hasInfoRequest(a))return a.overdue?'Overdue Response':'Awaiting Requester Response';if(hasQaPending(a))return 'Awaiting Requester Response';return '-';}
+function cancelReasonText(a){if(a.manualCancel)return 'ยกเลิกเอง';if(a.award==='no-result')return 'ไม่มีผู้เสนอ';if(a.award==='insufficient')return 'ผู้เสนอ < 3 ราย';if(a.award==='no-award')return 'ไม่เลือกผู้ชนะ';return 'ยกเลิก';}
+
+function inActionRequired(a){if(a.status==='Draft')return true;if(a.status==='Rejected by Approver'||a.status==='Rejected by PTVN')return true;if(hasInfoRequest(a))return true;return false;}
+function inApprovalFlow(a){if(a.status==='Awaiting Approval')return true;if(a.status==='PTVN Review'&&!hasInfoRequest(a))return true;return false;}
+function inActiveAuction(a){if(a.status!=='Active')return false;if(a.award==='waiting'||a.award==='awaiting-approval'||a.award==='rejected')return false;const ph=auctionPhase(a);return ph==='scheduled'||ph==='live';}
+function inAwaitingAward(a){if(a.status==='Active'&&auctionPhase(a)==='ended'&&a.award==='waiting')return true;if(a.award==='awaiting-approval')return true;return false;}
+function inAwardRejected(a){return a.award==='rejected';}
+function groupOf(a){if(inAwardRejected(a))return 'awardRejected';if(inActionRequired(a))return 'action';if(inApprovalFlow(a))return 'approval';if(inAwaitingAward(a))return 'awaitingAward';if(inActiveAuction(a))return 'active';return null;}
+const purchaserGroups=[
+  {key:'action',label:'Action Required',sub:'Draft · Rejected · PTVN',alert:true},
+  {key:'qaWaiting',label:'Awaiting Response',sub:'Q&A Board',alert:true},
+  {key:'active',label:'Active',sub:'Released · In Auction',alert:false},
+  {key:'awaitingAward',label:'Awaiting Award',sub:'Direct · Auction',alert:false},
+  {key:'awardRejected',label:'Award Rejected',sub:'Result sent back',alert:false},
+  {key:'approval',label:'In Approval',sub:'Approved · PTPR',alert:false}
+];
+const statusClass={'Draft':'st-draft','Awaiting Approval':'st-awaiting','Rejected by Approver':'st-rejected','Rejected by PTVN':'st-rejected','PTVN Review':'st-ptvn','Active':'st-active','Closed':'st-closed','Complete':'st-complete','Cancelled':'st-canceled'};
+const PIPELINE=['Draft','Awaiting Approval','Rejected by Approver','Rejected by PTVN','PTVN Review','Active'];
+function isActionItem(a){return inActionRequired(a)||inAwaitingAward(a)||inAwardRejected(a);}
+function actionPriority(a){if(hasInfoRequest(a)&&a.overdue)return 1;if(hasInfoRequest(a))return 2;if(inAwardRejected(a))return 3;if(a.status==='Rejected by Approver'||a.status==='Rejected by PTVN')return 4;if(inAwaitingAward(a))return 5;if(a.status==='Draft')return 6;return 7;}
+/* [PATCH 1] Live เหลือแค่จุด */
+/* [PATCH] Status pill ตามสเปค All_status.svg: LIVE เป็น pill สีแดงของตัวเอง, sub-alert อื่นแสดงเป็นไอคอน (i) hover ดูรายละเอียด */
+function statusPill(a){
+  const ph=auctionPhase(a),ds=displayStatus(a);
+  if(ph==='live')return `<span class="pill st-live"><span class="live-dot-sm"></span>LIVE</span>`;
+  const x=actionType(a);
+  const info=(x==='Awaiting Requester Response'||x==='Overdue Response')?`<span class="info-tip" data-tip="${x}"><i class="ti ti-info-circle"></i></span>`:'';
+  return `<span class="pill ${statusClass[ds]||'st-draft'}">${ds}</span>${info}`;
+}
+function dtParts(a){const s=new Date(a.auctionStart),e=new Date(a.auctionEnd);const dateStr=s.toLocaleDateString('th-TH',{day:'2-digit',month:'short',year:'2-digit'});const p=n=>String(n).padStart(2,'0');return{dateStr,timeStr:`${p(s.getHours())}:${p(s.getMinutes())}–${p(e.getHours())}:${p(e.getMinutes())} น.`};}
+function dateCell(a){const {dateStr,timeStr}=dtParts(a);return`<div class="date-main">${dateStr}</div><div class="date-time">${timeStr}</div>`;}
+function fmtReqDate(iso){if(!iso)return'-';const d=new Date(iso+'T00:00:00');if(isNaN(d))return iso;return d.toLocaleDateString('th-TH',{day:'2-digit',month:'short',year:'2-digit'});}
+function auctionDateOnly(a){return (a.auctionStart||'').slice(0,10);}
+
+let anScope='mine';
+function scopeFilter(a){if(anScope==='mine')return a.creator===ME();return true;}
+
+function getApprovalTasks(){
+  const me=AP_ME();const tasks=[];
+  auctions.forEach(a=>{
+    const f=a.approvalFlow;if(!f)return;
+    if(f.setup?.state==='pending'&&f.setup.approver===me)tasks.push({auction:a,type:'setup',label:'อนุมัติให้จัดงาน',requestedAt:f.setup.requestedAt||''});
+    if(f.result?.state==='pending'&&f.result.approver===me)tasks.push({auction:a,type:'result',label:'อนุมัติผลประมูล',requestedAt:f.result.requestedAt||''});
+  });
+  const order={setup:0,result:1};
+  tasks.sort((x,y)=>order[x.type]-order[y.type]||auctionDateOnly(x.auction).localeCompare(auctionDateOnly(y.auction)));
+  return tasks;
+}
+function approvalCounts(){const t=getApprovalTasks();return{setup:t.filter(x=>x.type==='setup').length,result:t.filter(x=>x.type==='result').length,total:t.length};}
+
+function queryAuctions({listScope,groupFilter,q,field,from,to,page}){
+  let rows=auctions.filter(scopeFilter);
+  rows=rows.filter(a=>{if(listScope==='pipeline')return PIPELINE.includes(a.status);if(listScope==='complete')return a.status==='Complete';if(listScope==='canceled')return a.status==='Cancelled';return true;});
+  if(listScope==='pipeline'&&groupFilter)rows=rows.filter(a=>groupFilter==='qaWaiting'?hasQaPending(a):groupOf(a)===groupFilter);
+  rows=rows.filter(a=>matchField(a,q,field)&&matchDate(a,from,to));
+  rows.sort((a,b)=>{const ar=isActionItem(a)?0:1,br=isActionItem(b)?0:1;if(listScope==='pipeline'){if(ar!==br)return ar-br;if(ar===0&&br===0){const pa=actionPriority(a),pb=actionPriority(b);if(pa!==pb)return pa-pb;return auctionDateOnly(a).localeCompare(auctionDateOnly(b));}}return auctionDateOnly(b).localeCompare(auctionDateOnly(a));});
+  const total=rows.length,totalPages=Math.max(1,Math.ceil(total/PAGE_SIZE)),p=Math.min(Math.max(1,page),totalPages);
+  return{rows:rows.slice((p-1)*PAGE_SIZE,(p-1)*PAGE_SIZE+PAGE_SIZE),total,totalPages,page:p};
+}
+function matchField(a,q,field){if(!q)return true;const t=q.toLowerCase(),v=x=>(x||'').toLowerCase();const awardTxt=(a.status==='Cancelled'&&a.manualCancel)?'—':((awardMap[a.award]||{}).txt||'');switch(field){case 'auctionId':return v(a.auctionId).includes(t);case 'format':return v(a.format).includes(t);case 'type':return v(a.type).includes(t);case 'name':return v(a.name).includes(t);case 'award':return v(awardTxt).includes(t);case 'creator':return v(a.creator).includes(t);default:return[a.auctionId,a.format,a.type,a.name,awardTxt,a.creator].some(x=>v(x).includes(t));}}
+function matchDate(a,from,to){const d=auctionDateOnly(a);if(!from&&!to)return true;if(from&&d<from)return false;if(to&&d>to)return false;return true;}
+
+function rowTpl(a){const ph=auctionPhase(a);const rc=inAwardRejected(a)?'row-rej':(isActionItem(a)?'row-alert':(ph==='live'?'row-live':''));const showCreator=anScope==='team';return`<tr class="${rc}" onclick="openDetail('${a.auctionId}')"><td class="td-mono">${a.auctionId}</td><td>${a.format}</td><td>${a.type}</td><td class="td-clamp" title="${a.name}">${a.name}</td><td>${statusPill(a)}</td><td>${dateCell(a)}</td><td>${awardChip(a)}</td><td class="col-creator ${showCreator?'':'hide-col'}">${a.creator}</td></tr>`;}
+function apprRowTpl(t){const a=t.auction;const tag=t.type==='setup'?`<span class="ap-type-txt">อนุมัติให้จัดงาน</span>`:`<span class="ap-type-txt">อนุมัติผลประมูล</span>`;return`<tr class="row-appr" onclick="openDetail('${a.auctionId}')"><td class="td-id">${a.auctionId}</td><td class="td-clamp" title="${a.name}">${a.name}</td><td>${tag}</td><td>${a.creator}</td><td style="color:var(--muted);font-size:12px">${fmtReqDate(t.requestedAt)}</td></tr>`;}
+
+function renderPagination(btnsEl,infoEl,res,onGo){infoEl.innerHTML=`<strong>${res.total===0?0:(res.page-1)*PAGE_SIZE+1}–${Math.min(res.page*PAGE_SIZE,res.total)}</strong> จาก <strong>${res.total}</strong> รายการ`;btnsEl.innerHTML='';if(res.totalPages<=1)return;const add=(l,p,dis=false,act=false)=>{const b=document.createElement('button');b.className='pg-btn'+(act?' active':'');b.innerHTML=l;b.disabled=dis;if(!dis&&!act)b.onclick=()=>onGo(p);btnsEl.appendChild(b);};add('<i class="ti ti-chevron-left"></i>',res.page-1,res.page===1);const range=[];if(res.totalPages<=7){for(let i=1;i<=res.totalPages;i++)range.push(i);}else{range.push(1);if(res.page>3)range.push('…');for(let i=Math.max(2,res.page-1);i<=Math.min(res.totalPages-1,res.page+1);i++)range.push(i);if(res.page<res.totalPages-2)range.push('…');range.push(res.totalPages);}range.forEach(r=>{if(r==='…'){const s=document.createElement('span');s.className='pg-ellipsis';s.textContent='...';btnsEl.appendChild(s);}else add(r,r,false,r===res.page);});add('<i class="ti ti-chevron-right"></i>',res.page+1,res.page===res.totalPages);}
+function val(id){const el=document.getElementById(id);return el?el.value:'';}
+
+/* ===== SELECT DATE RANGE PICKER ===== */
+const datePickers={};
+function pad2(n){return String(n).padStart(2,'0');}
+function fmtISO(y,m,d){return `${y}-${pad2(m+1)}-${pad2(d)}`;}
+function fmtDMY(iso){if(!iso)return'';const [y,m,d]=iso.split('-');return `${d}/${m}/${y}`;}
+function dpState(prefix){if(!datePickers[prefix]){const now=new Date();const f=val(prefix+'From'),t=val(prefix+'To');datePickers[prefix]={fromY:now.getFullYear(),fromM:now.getMonth(),toY:now.getFullYear(),toM:now.getMonth(),draftFrom:f||'',draftTo:t||''};}return datePickers[prefix];}
+function toggleDatePicker(prefix){document.querySelectorAll('.date-dd').forEach(d=>{if(d.id!==prefix+'DateDd')d.classList.remove('open');});const dd=document.getElementById(prefix+'DateDd');dd.classList.toggle('open');if(dd.classList.contains('open')){positionDateDd(prefix);renderDatePicker(prefix);}}
+function positionDateDd(prefix){
+  const dd=document.getElementById(prefix+'DateDd'),btn=document.getElementById(prefix+'DateBtn');
+  if(!dd||!btn)return;
+  const r=btn.getBoundingClientRect();
+  const ddWidth=Math.min(600,window.innerWidth-24);
+  dd.style.width=ddWidth+'px';
+  let left=r.left;
+  if(left+ddWidth>window.innerWidth-12)left=window.innerWidth-ddWidth-12;
+  if(left<12)left=12;
+  let top=r.bottom+8;
+  dd.style.left=left+'px';
+  dd.style.top=top+'px';
+}
+window.addEventListener('resize',()=>{document.querySelectorAll('.date-dd.open').forEach(d=>{const prefix=d.id.replace('DateDd','');positionDateDd(prefix);});});
+window.addEventListener('scroll',()=>{document.querySelectorAll('.date-dd.open').forEach(d=>{const prefix=d.id.replace('DateDd','');positionDateDd(prefix);});},true);
+function calGrid(y,m,selectedIso,prefix,which){const first=new Date(y,m,1),startDow=first.getDay(),daysInMonth=new Date(y,m+1,0).getDate(),prevDays=new Date(y,m,0).getDate();let cells='';for(let i=0;i<startDow;i++)cells+=`<div class="cal-day muted">${prevDays-startDow+1+i}</div>`;const now=new Date(),todayIso=fmtISO(now.getFullYear(),now.getMonth(),now.getDate());for(let d=1;d<=daysInMonth;d++){const iso=fmtISO(y,m,d);const cls=['cal-day'];if(iso===todayIso)cls.push('today');if(iso===selectedIso)cls.push('selected');cells+=`<div class="${cls.join(' ')}" onclick="dpPick('${prefix}','${which}','${iso}')">${d}</div>`;}return cells;}
+function renderDatePicker(prefix){
+  const st=dpState(prefix),monthName=(y,m)=>new Date(y,m,1).toLocaleDateString('en',{month:'long'}),dowHtml=['SU','MO','TU','WE','TH','FR','SA'].map(d=>`<div class="cal-dow">${d}</div>`).join('');
+  document.getElementById(prefix+'DateDd').innerHTML=`<div class="date-dd-cols">`+
+    `<div class="date-dd-col"><div class="date-dd-label">From:</div><input class="date-dd-input" value="${fmtDMY(st.draftFrom)}" placeholder="DD/MM/YYYY" readonly><div class="cal-head"><button onclick="dpNav('${prefix}','from',-1)"><i class="ti ti-chevron-left"></i></button><div class="cal-title">${monthName(st.fromY,st.fromM)}, ${st.fromY}</div><button onclick="dpNav('${prefix}','from',1)"><i class="ti ti-chevron-right"></i></button></div><div class="cal-grid">${dowHtml}${calGrid(st.fromY,st.fromM,st.draftFrom,prefix,'from')}</div><div class="date-dd-today" onclick="dpToday('${prefix}','from')">Today</div></div>`+
+    `<div class="date-dd-col"><div class="date-dd-label">To:</div><input class="date-dd-input" value="${fmtDMY(st.draftTo)}" placeholder="DD/MM/YYYY" readonly><div class="cal-head"><button onclick="dpNav('${prefix}','to',-1)"><i class="ti ti-chevron-left"></i></button><div class="cal-title">${monthName(st.toY,st.toM)}, ${st.toY}</div><button onclick="dpNav('${prefix}','to',1)"><i class="ti ti-chevron-right"></i></button></div><div class="cal-grid">${dowHtml}${calGrid(st.toY,st.toM,st.draftTo,prefix,'to')}</div><div class="date-dd-today" onclick="dpToday('${prefix}','to')">Today</div></div>`+
+    `</div><div class="date-dd-foot" style="justify-content:flex-end"><button class="btn btn-primary btn-sm" onclick="dpApply('${prefix}')">Apply</button></div>`;
+}
+function dpPick(prefix,which,iso){const st=dpState(prefix);if(which==='from')st.draftFrom=iso;else st.draftTo=iso;renderDatePicker(prefix);}
+function dpNav(prefix,which,delta){const st=dpState(prefix);let m=(which==='from')?st.fromM:st.toM,y=(which==='from')?st.fromY:st.toY;m+=delta;if(m<0){m=11;y--;}if(m>11){m=0;y++;}if(which==='from'){st.fromM=m;st.fromY=y;}else{st.toM=m;st.toY=y;}renderDatePicker(prefix);}
+function dpToday(prefix,which){const now=new Date(),iso=fmtISO(now.getFullYear(),now.getMonth(),now.getDate()),st=dpState(prefix);if(which==='from'){st.fromY=now.getFullYear();st.fromM=now.getMonth();st.draftFrom=iso;}else{st.toY=now.getFullYear();st.toM=now.getMonth();st.draftTo=iso;}renderDatePicker(prefix);}
+function dpApply(prefix){const st=dpState(prefix),fromEl=document.getElementById(prefix+'From'),toEl=document.getElementById(prefix+'To');if(fromEl)fromEl.value=st.draftFrom||'';if(toEl)toEl.value=st.draftTo||'';const lbl=document.getElementById(prefix+'DateLabel');const hasVal=!!(st.draftFrom||st.draftTo);if(lbl)lbl.textContent=hasVal?`${fmtDMY(st.draftFrom)||'…'} – ${fmtDMY(st.draftTo)||'…'}`:'Select Date';const btn=document.getElementById(prefix+'DateBtn');if(btn)btn.classList.toggle('selected',hasVal);document.getElementById(prefix+'DateDd').classList.remove('open');if(prefix==='main')onSearch();else onListSearch();}
+document.addEventListener('click',e=>{if(!e.target.closest('.date-dd-wrap'))document.querySelectorAll('.date-dd').forEach(d=>d.classList.remove('open'));});
+
+let groupFilter='',mainPage=1,searchTimer=null;
+function renderKpiGroup(){
+  const el=document.getElementById('kpiGroup');let html='';
+  const isApproverOnly=hasRole('approver')&&!hasRole('purchaser');
+  if(hasRole('purchaser')){
+    const cnt={};purchaserGroups.forEach(g=>cnt[g.key]=0);
+    auctions.filter(scopeFilter).forEach(a=>{const g=groupOf(a);if(g&&cnt[g]!==undefined)cnt[g]++;});
+    cnt.qaWaiting=Object.keys(qaData).filter(no=>{const a=auctions.find(x=>x.auctionId===no);return a&&scopeFilter(a)&&qaBoardOpen(a);}).reduce((s,no)=>s+qaStats(no).pending,0);
+    html+=`<div class="kpi-block"><div class="kpi-block-label l-purchaser">ในฐานะผู้จัดประมูล</div><div class="kpi-cards n6">`+
+      purchaserGroups.map(g=>`<div class="gcard ${groupFilter===g.key?'active-card':''}" onclick="toggleGroup('${g.key}')"><div class="accent"></div><div class="gc-top"><div class="gc-count">${cnt[g.key]||0}</div>${g.alert?`<div class="gc-badge">!</div>`:''}</div><div class="gc-label ${g.alert?'gc-alert':''}">${g.label}</div><div class="gc-sub">${g.sub}</div></div>`).join('')+`</div></div>`;
+  }
+  if(hasRole('approver')){
+    const ac=approvalCounts();
+    html+=`<div class="kpi-block"><div class="kpi-block-label l-approver">ในฐานะผู้อนุมัติ</div><div class="kpi-cards n2">`+
+      `<div class="gcard appr-card" onclick="scrollToApproval()"><div class="accent"></div><div class="gc-top"><div class="gc-count">${ac.setup}</div></div><div class="gc-label">รออนุมัติให้จัดงาน</div><div class="gc-sub">ก่อนเปิดประมูล</div></div>`+
+      `<div class="gcard appr-card" onclick="scrollToApproval()"><div class="accent"></div><div class="gc-top"><div class="gc-count">${ac.result}</div></div><div class="gc-label">รออนุมัติผลประมูล</div><div class="gc-sub">หลังเลือกผู้ชนะ</div></div>`+
+      `</div></div>`;
+  }
+  /* [PATCH 4] approver-only: Quick Action (ประวัติ) มาอยู่แถวเดียวกับการ์ด KPI */
+  if(isApproverOnly){
+    html+=`<div class="kpi-block" style="flex:0 0 auto;max-width:280px"><div class="kpi-block-label l-approver">ทางลัด</div><div class="kpi-cards n1">`+
+      `<div class="qa-inline" onclick="openList('history')"><div class="qa-ic qa-ic-history"><i class="ti ti-history"></i></div><div class="qa-meta"><div class="qa-title">ประวัติการอนุมัติ</div><div class="qa-desc">อนุมัติ + ตีกลับ</div></div><div class="qa-num qa-num-history">${approvalHistory.length}</div><i class="ti ti-chevron-right qa-arrow"></i></div>`+
+      `</div></div>`;
+  }
+  el.innerHTML=html;
+}
+function toggleGroup(k){groupFilter=(groupFilter===k)?'':k;mainPage=1;renderKpiGroup();loadMain();const bar=document.getElementById('afBar');if(bar){if(groupFilter){const g=purchaserGroups.find(x=>x.key===groupFilter);bar.classList.add('show');document.getElementById('afText').textContent=`กำลังกรอง: ${g.label}`;}else bar.classList.remove('show');}}
+function clearCardFilter(){groupFilter='';mainPage=1;renderKpiGroup();loadMain();const b=document.getElementById('afBar');if(b)b.classList.remove('show');}
+function scrollToApproval(){const inMain=document.getElementById('apprCardInMain');const el=inMain||document.getElementById('approvalWidgetSlot');if(el)el.scrollIntoView({behavior:'smooth',block:'start'});}
+
+/* ===== APPROVAL WIDGET ===== */
+function apprTableHtml(tasks,minw){
+  return `<div class="table-wrap"><table style="min-width:${minw}px"><thead><tr><th style="min-width:120px">รหัสการประมูล</th><th style="min-width:200px">ชื่อการประมูล</th><th style="min-width:170px">ประเภทการอนุมัติ</th><th style="min-width:170px">ผู้ขออนุมัติ</th><th style="min-width:110px">วันที่ขอ</th></tr></thead><tbody>${tasks.length?tasks.map(apprRowTpl).join(''):`<tr class="empty-row"><td colspan="5"><i class="ti ti-circle-check" style="font-size:24px;color:var(--ok);display:block;margin-bottom:6px"></i>ไม่มีงานรออนุมัติ — เคลียร์หมดแล้ว 🎉</td></tr>`}</tbody></table></div>`;
+}
+function renderApprovalWidget(){
+  const tasks=getApprovalTasks();
+  const shown=tasks.slice(0,5);
+  const viewAll=`<a href="javascript:void(0)" onclick="openList('approvals')" style="font-size:12px;color:var(--primary);font-weight:600;text-decoration:none">ดูทั้งหมด(${tasks.length}) →</a>`;
+  return `<div class="card appr-accent" id="apprCard"><div class="card-header"><div class="card-title">งานที่ต้องอนุมัติ <span class="hcount">${tasks.length} รายการ</span></div>${viewAll}</div>${apprTableHtml(shown,720)}</div>`;
+}
+
+function renderMainTable(){
+  return `<div class="card"><div class="card-header"><div class="card-title">งานที่กำลังดำเนินการ <span class="hcount" id="totalBadge"></span></div><span style="font-size:11px;color:var(--muted)">5 / หน้า</span></div><div id="afBar" class="af-bar"><span id="afText"></span><button class="btn" onclick="clearCardFilter()"><i class="ti ti-x"></i> ล้างตัวกรอง</button></div><div class="search-bar"><input class="in in-text" id="mainQ" type="text" placeholder="ค้นหา..." oninput="onSearch()"><select class="in in-field" id="mainField" onchange="onSearch()"><option value="all">All Fields</option><option value="auctionId">AuctionID</option><option value="format">Format</option><option value="type">Type</option><option value="name">Auction Name</option><option value="award">Award Status</option><option value="creator">Create by</option></select><input type="hidden" id="mainFrom"><input type="hidden" id="mainTo"><div class="date-dd-wrap"><button class="btn-datepick" id="mainDateBtn" onclick="toggleDatePicker('main')"><span id="mainDateLabel">Select Date</span><i class="ti ti-chevron-down" style="font-size:13px"></i></button><div class="date-dd" id="mainDateDd" onclick="event.stopPropagation()"></div></div><button class="btn btn-ghost" style="height:34px;padding:0 10px" onclick="clearMainSearch()"><i class="ti ti-refresh"></i></button></div><div class="table-wrap"><div class="loading-overlay" id="loadMain"><i class="ti ti-loader-2" style="animation:spin 1s linear infinite"></i> กำลังโหลด...</div><table><thead><tr><th style="min-width:128px">AuctionID</th><th style="min-width:120px">Format</th><th style="min-width:80px">Type</th><th style="min-width:190px">Auction Name</th><th style="min-width:190px">Status</th><th style="min-width:140px">Auction Date</th><th style="min-width:160px">Award Status</th><th class="col-creator hide-col" style="min-width:110px">Create by</th></tr></thead><tbody id="mainTb"></tbody></table></div><div class="pagination"><div class="pg-info" id="pgInfo"></div><div class="pg-btns" id="pgBtns"></div></div></div>`;
+}
+function loadMain(){const tb=document.getElementById('mainTb');if(!tb)return;const ld=document.getElementById('loadMain');if(ld)ld.classList.add('show');setTimeout(()=>{const res=queryAuctions({listScope:'pipeline',groupFilter,q:val('mainQ'),field:val('mainField'),from:val('mainFrom'),to:val('mainTo'),page:mainPage});mainPage=res.page;tb.innerHTML=res.rows.length?res.rows.map(rowTpl).join(''):`<tr class="empty-row"><td colspan="8">ไม่พบรายการ</td></tr>`;const tbg=document.getElementById('totalBadge');if(tbg)tbg.textContent=`${res.total} รายการ`;renderPagination(document.getElementById('pgBtns'),document.getElementById('pgInfo'),res,p=>{mainPage=p;loadMain();});if(ld)ld.classList.remove('show');},120);}
+function onSearch(){clearTimeout(searchTimer);searchTimer=setTimeout(()=>{mainPage=1;loadMain();},300);}
+function clearMainSearch(){['mainQ','mainFrom','mainTo'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});const f=document.getElementById('mainField');if(f)f.value='all';delete datePickers.main;const lbl=document.getElementById('mainDateLabel');if(lbl)lbl.textContent='Select Date';const btn=document.getElementById('mainDateBtn');if(btn)btn.classList.remove('selected');mainPage=1;loadMain();}
+
+function renderUpcomingWidget(){
+  const rowsSrc=auctions.filter(scopeFilter);
+  const live=rowsSrc.filter(a=>auctionPhase(a)==='live');
+  const sched=rowsSrc.filter(a=>auctionPhase(a)==='scheduled').sort((a,b)=>new Date(a.auctionStart)-new Date(b.auctionStart));
+  const rows=[...live,...sched].slice(0,5);
+  const body=rows.length?rows.map(a=>{const s=new Date(a.auctionStart),day=s.getDate(),mon=s.toLocaleDateString('en',{month:'short'}).toUpperCase(),ph=auctionPhase(a),p=n=>String(n).padStart(2,'0'),hm=`${p(s.getHours())}:${p(s.getMinutes())}`;const tag=ph==='live'?`<span class="up-tag up-tag-live"><span class="up-tag-dot" style="background:var(--ok)"></span>Live ตอนนี้</span>`:`<span class="up-tag up-tag-sched"><span class="up-tag-dot" style="background:var(--muted)"></span>เริ่ม ${hm} น.</span>`;return`<div class="up-item" onclick="openDetail('${a.auctionId}')"><div class="up-day ${ph==='live'?'d-live':'d-sched'}"><div class="d">${day}</div><div class="m">${mon}</div></div><div class="up-info"><div class="up-name">${a.name}</div><div class="up-sub">${a.auctionId}</div>${tag}</div></div>`;}).join(''):`<div class="side-empty">ไม่มีงานที่กำลังจะมาถึง</div>`;
+  return `<div class="side-card"><div class="side-h">งานที่กำลังจะมาถึง</div><div class="side-body">${body}</div></div>`;
+}
+function renderQuickActionWidget(){
+  const rowsSrc=auctions.filter(scopeFilter);
+  let items='';
+  if(hasRole('purchaser')){
+    items+=`<div class="qa-item qa-all" onclick="openList('all')"><div class="qa-ic qa-ic-all"><i class="ti ti-stack-2"></i></div><div class="qa-meta"><div class="qa-title">All Auctions</div><div class="qa-desc">งานทั้งหมดทุกสถานะ</div></div><div class="qa-num qa-num-all">${rowsSrc.length}</div><i class="ti ti-chevron-right qa-arrow"></i></div>`;
+    items+=`<div class="qa-item qa-complete" onclick="openList('complete')"><div class="qa-ic qa-ic-complete"><i class="ti ti-award"></i></div><div class="qa-meta"><div class="qa-title">Award Completed</div><div class="qa-desc">งานที่ได้ผู้ชนะแล้ว</div></div><div class="qa-num qa-num-complete">${rowsSrc.filter(a=>a.status==='Complete').length}</div><i class="ti ti-chevron-right qa-arrow"></i></div>`;
+    items+=`<div class="qa-item qa-cancel" onclick="openList('canceled')"><div class="qa-ic qa-ic-cancel"><i class="ti ti-ban"></i></div><div class="qa-meta"><div class="qa-title">Canceled</div><div class="qa-desc">งานที่ถูกยกเลิก</div></div><div class="qa-num qa-num-cancel">${rowsSrc.filter(a=>a.status==='Cancelled').length}</div><i class="ti ti-chevron-right qa-arrow"></i></div>`;
+  }
+  if(hasRole('approver')&&hasRole('purchaser')){
+    items+=`<div class="qa-item qa-history" onclick="openList('history')"><div class="qa-ic qa-ic-history"><i class="ti ti-history"></i></div><div class="qa-meta"><div class="qa-title">ประวัติการอนุมัติ</div><div class="qa-desc">อนุมัติ + ตีกลับ</div></div><div class="qa-num qa-num-history">${approvalHistory.length}</div><i class="ti ti-chevron-right qa-arrow"></i></div>`;
+  }
+  return `<div class="side-card"><div class="side-h">Quick Action</div><div class="side-body">${items}</div></div>`;
+}
+
+/* ===== ANALYTICS ===== */
+let anRange=12,analyticsView='created',chSavings,chOutcome;
+const C={primary:'#0C56C9',highlight:'#A3E4D7',lineBlue:'#027BE0',teal:'#019E82',purple:'#8B5CF6',purpleSoft:'#C9BCF8',purpleLine:'#8B5CF6',noaward:'#A0AAB2',noresult:'#D99B9B',insuf:'#E5C185',orange:'#F27326'};
+function renderAnalyticsShell(){
+  const slot=document.getElementById('analyticsSlot');
+  const showToggle=hasRole('purchaser')&&hasRole('approver');
+  const onlyApprover=hasRole('approver')&&!hasRole('purchaser');
+  if(onlyApprover)analyticsView='approved';else if(!showToggle)analyticsView='created';
+  const title=onlyApprover?'ภาพรวมการอนุมัติ':'ภาพรวมการประมูล';
+  let toggle='';
+  if(showToggle)toggle=`<div class="an-viewseg"><button class="${analyticsView==='created'?'active':''}" data-view="created" onclick="setAnalyticsView('created')">งานที่ฉันเปิด</button><button class="${analyticsView==='approved'?'active':''}" data-view="approved" onclick="setAnalyticsView('approved')">งานที่ฉันอนุมัติ</button></div>`;
+  slot.innerHTML=`<div class="an-head"><div class="an-title">${title}</div><div class="an-controls">${toggle}<div class="seg" id="rangeSeg"><button data-range="3" onclick="setRange(3)">3 เดือน</button><button data-range="6" onclick="setRange(6)">6 เดือน</button><button class="active" data-range="12" onclick="setRange(12)">12 เดือน</button></div></div></div><div class="kpi-grid" id="anKpi"></div><div class="chart-grid"><div class="chart-card"><div class="chart-h" id="chSavH"></div><div class="chart-body"><div class="chart-box"><canvas id="chSavings"></canvas></div></div></div><div class="chart-card"><div class="chart-h" id="chOutH"></div><div class="chart-body"><div class="chart-box sm"><canvas id="chOutcome"></canvas></div><div class="legend-row" id="outcomeLegend"></div></div></div></div>`;
+  renderAnalytics();
+}
+function setAnalyticsView(v){analyticsView=v;document.querySelectorAll('.an-viewseg button').forEach(b=>b.classList.toggle('active',b.dataset.view===v));renderAnalytics();}
+function setRange(r){anRange=r;document.querySelectorAll('#rangeSeg button').forEach(b=>b.classList.toggle('active',+b.dataset.range===r));renderAnalytics();}
+function analyticsSource(){
+  const me=ME(),apMe=AP_ME();
+  if(analyticsView==='approved'){
+    return auctions.filter(a=>(a.approvalFlow?.result?.approver===apMe&&(a.approvalFlow.result.state==='approved'||a.approvalFlow.result.state==='pending'))||(a.approvalFlow?.setup?.approver===apMe&&a.approvalFlow.setup.state==='approved'));
+  }
+  return auctions.filter(a=>a.creator===me);
+}
+function analyticsData(){
+  const now=new Date(),minDate=new Date(now.getFullYear(),now.getMonth()-anRange+1,1);
+  let rows=analyticsSource().filter(a=>new Date(a.auctionStart)>=minDate);
+  const months=[];for(let i=anRange-1;i>=0;i--){const d=new Date(now.getFullYear(),now.getMonth()-i,1);months.push({key:`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`,label:d.toLocaleDateString('th-TH',{month:'short',year:'2-digit'})});}
+  const savBy={},volBy={};months.forEach(m=>{savBy[m.key]=0;volBy[m.key]=0;});
+  let totalSav=0,totalSpend=0,totalBudgetAw=0,oc_c=0,oc_nr=0,oc_in=0,oc_na=0,bidSum=0,bidCnt=0,rejected=0;
+  rows.forEach(a=>{const d=new Date(a.auctionStart),key=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;if(volBy[key]!==undefined)volBy[key]++;if(a.status==='Complete'||a.award==='awarded'||a.award==='awaiting-approval'){oc_c++;if(a.budget&&a.winning){const s=a.budget-a.winning;totalSav+=s;totalSpend+=a.winning;totalBudgetAw+=a.budget;if(savBy[key]!==undefined)savBy[key]+=s;}}else if(a.award==='no-result')oc_nr++;else if(a.award==='insufficient')oc_in++;else if(a.award==='no-award')oc_na++;if(a.award==='rejected')rejected++;if(a.bidders>0){bidSum+=a.bidders;bidCnt++;}});
+  const succDenom=oc_c+oc_nr+oc_in+oc_na,succRate=succDenom>0?Math.round(oc_c/succDenom*100):0,avgBid=bidCnt>0?(bidSum/bidCnt).toFixed(1):0,savPct=totalBudgetAw>0?Math.round(totalSav/totalBudgetAw*100):0;
+  return{months,savBy,volBy,totalSav,totalSpend,succRate,succDenom,avgBid,savPct,rejected,approvedCount:oc_c,outcome:{complete:oc_c,noresult:oc_nr,insufficient:oc_in,noaward:oc_na}};
+}
+function renderAnalytics(){
+  const D=analyticsData(),isAppr=analyticsView==='approved';
+  const kpi=document.getElementById('anKpi');
+  if(isAppr){
+    kpi.innerHTML=`<div class="kpi"><div><span class="kpi-val">${D.approvedCount}</span><span class="kpi-unit">งาน</span></div><div class="kpi-label">อนุมัติผ่าน (ในช่วง)</div><div class="kpi-delta" style="color:var(--muted)"><i class="ti ti-gavel"></i> ผ่านการอนุมัติของฉัน</div></div><div class="kpi"><div><span class="kpi-val">${(D.totalSpend).toFixed(1)}</span><span class="kpi-unit">ลบ.</span></div><div class="kpi-label">มูลค่าที่อนุมัติ</div><div class="kpi-delta" style="color:var(--muted)"><i class="ti ti-receipt"></i> ราคาปิดรวม</div></div><div class="kpi"><div><span class="kpi-val">${D.totalSav.toFixed(1)}</span><span class="kpi-unit">ลบ.</span></div><div class="kpi-label">Savings ที่ผ่านมือ</div><div class="kpi-delta delta-up"><i class="ti ti-trending-up"></i> ${D.savPct}% จากงบ</div></div><div class="kpi"><div><span class="kpi-val">${D.rejected}</span><span class="kpi-unit">งาน</span></div><div class="kpi-label">ตีกลับ (ในช่วง)</div><div class="kpi-delta" style="color:var(--muted)"><i class="ti ti-shield-check"></i> คุมคุณภาพ</div></div>`;
+  }else{
+    kpi.innerHTML=`<div class="kpi"><div><span class="kpi-val">${D.totalSav.toFixed(1)}</span><span class="kpi-unit">ลบ.</span></div><div class="kpi-label">มูลค่าที่ประหยัดได้</div><div class="kpi-delta delta-up"><i class="ti ti-trending-up"></i> ${D.savPct}% จากงบตั้งต้น</div></div><div class="kpi"><div><span class="kpi-val">${D.totalSpend.toFixed(1)}</span><span class="kpi-unit">ลบ.</span></div><div class="kpi-label">งบที่ใช้จ่ายจริง</div><div class="kpi-delta" style="color:var(--muted)"><i class="ti ti-receipt"></i> ราคาปิดรวม</div></div><div class="kpi"><div><span class="kpi-val">${D.succRate}</span><span class="kpi-unit">%</span></div><div class="kpi-label">อัตราประมูลสำเร็จ</div><div class="kpi-delta delta-up"><i class="ti ti-check"></i> ${D.outcome.complete} จาก ${D.succDenom} งาน</div></div><div class="kpi"><div><span class="kpi-val">${D.avgBid}</span><span class="kpi-unit">ราย</span></div><div class="kpi-label">เฉลี่ยผู้เข้าร่วม</div><div class="kpi-delta delta-up"><i class="ti ti-arrows-join"></i> การแข่งขัน</div></div>`;
+  }
+  const barColor=isAppr?C.purpleSoft:C.highlight,lineColor=isAppr?C.purpleLine:C.lineBlue;
+  document.getElementById('chSavH').innerHTML=`<div class="t">${isAppr?'มูลค่า Savings จากงานที่อนุมัติ':'Savings & จำนวนงาน รายเดือน'}</div><div class="sub">แท่ง = savings (ลบ.) · เส้น = จำนวนงาน</div>`;
+  document.getElementById('chOutH').innerHTML=`<div class="t">${isAppr?'งานที่อนุมัติ จบยังไง':'ผลการประมูล'}</div><div class="sub">เฉพาะงานที่ประมูลจริง</div>`;
+  const labels=D.months.map(m=>m.label),savData=D.months.map(m=>+D.savBy[m.key].toFixed(1)),volData=D.months.map(m=>D.volBy[m.key]);
+  if(chSavings)chSavings.destroy();
+  try{
+  chSavings=new Chart(document.getElementById('chSavings'),{data:{labels,datasets:[{type:'bar',label:'Savings (ลบ.)',data:savData,backgroundColor:barColor,borderRadius:6,yAxisID:'y',order:2},{type:'line',label:'จำนวนงาน',data:volData,borderColor:lineColor,backgroundColor:lineColor,borderWidth:2,tension:.35,pointRadius:3,yAxisID:'y1',order:1}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:true,position:'top',labels:{boxWidth:12,font:{size:11},usePointStyle:true}},tooltip:{callbacks:{label:c=>c.dataset.yAxisID==='y'?` ${c.dataset.label}: ${c.parsed.y} ลบ.`:` ${c.dataset.label}: ${c.parsed.y} งาน`}}},scales:{y:{position:'left',beginAtZero:true,title:{display:true,text:'Savings (ลบ.)',font:{size:10}},grid:{color:'#eef3fa'},ticks:{font:{size:10}}},y1:{position:'right',beginAtZero:true,title:{display:true,text:'จำนวนงาน',font:{size:10}},grid:{drawOnChartArea:false},ticks:{font:{size:10},precision:0}},x:{grid:{display:false},ticks:{font:{size:10}}}}}});
+  }catch(e){console.warn('Chart render skipped (chSavings):',e);}
+  const ocLabels=['Complete (Awarded)','ไม่มีผู้เสนอ','ผู้เสนอ < 3 ราย','ไม่เลือกผู้ชนะ'],ocColors=[isAppr?C.purpleSoft:C.highlight,C.noresult,C.insuf,C.noaward],ocData=[D.outcome.complete,D.outcome.noresult,D.outcome.insufficient,D.outcome.noaward];
+  if(chOutcome)chOutcome.destroy();
+  try{
+  chOutcome=new Chart(document.getElementById('chOutcome'),{type:'doughnut',data:{labels:ocLabels,datasets:[{data:ocData,backgroundColor:ocColors,borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,cutout:'64%',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>{const tot=ocData.reduce((s,x)=>s+x,0),pct=tot?Math.round(c.parsed/tot*100):0;return ` ${c.label}: ${c.parsed} งาน (${pct}%)`;}}}}}});
+  }catch(e){console.warn('Chart render skipped (chOutcome):',e);}
+  document.getElementById('outcomeLegend').innerHTML=ocLabels.map((l,i)=>ocData[i]?`<span class="lg-chip"><span class="lg-dot" style="background:${ocColors[i]}"></span>${l} (${ocData[i]})</span>`:'').join('');
+}
+
+/* ===== LIST VIEW ===== */
+let listScope='all',listPage=1,listTimer=null;
+const listMeta={all:{title:'All Auctions',ic:'ti-stack-2',color:'var(--primary)'},complete:{title:'Award Completed',ic:'ti-award',color:'var(--teal)'},canceled:{title:'Cancelled',ic:'ti-ban',color:'#7C7C7C'},history:{title:'ประวัติการอนุมัติ',ic:'ti-history',color:'var(--purple-deep)'},approvals:{title:'งานที่ต้องอนุมัติ',ic:'ti-clipboard-check',color:'var(--purple-deep)'}};
+function openList(scope){listScope=scope;listPage=1;const m=listMeta[scope];document.getElementById('lvTitle').innerHTML=`<i class="ti ${m.ic}" style="color:${m.color}"></i> ${m.title}`;buildListSearchBar(scope);document.getElementById('dashView').style.display='none';document.getElementById('listView').style.display='block';window.scrollTo(0,0);loadList();}
+function backToDash(){document.getElementById('listView').style.display='none';document.getElementById('dashView').style.display='block';window.scrollTo(0,0);}
+function buildListSearchBar(scope){
+  const bar=document.getElementById('lvSearchBar'),head=document.getElementById('lvHead');
+  if(scope==='history'){
+    bar.innerHTML=`<input class="in in-text" id="lvQ" type="text" placeholder="ค้นหา..." oninput="onListSearch()"><select class="in in-field" id="lvType" onchange="onListSearch()"><option value="all">ทุกประเภท</option><option value="setup">อนุมัติจัดงาน</option><option value="result">อนุมัติผล</option></select><select class="in in-field" id="lvResult" onchange="onListSearch()"><option value="all">ทุกผลลัพธ์</option><option value="approved">อนุมัติ</option><option value="rejected">ตีกลับ</option></select><button class="btn btn-ghost" style="height:34px;padding:0 10px" onclick="clearListSearch()"><i class="ti ti-refresh"></i></button>`;
+    head.innerHTML=`<tr><th style="min-width:128px">AuctionID</th><th style="min-width:200px">Auction Name</th><th style="min-width:150px">ประเภท</th><th style="min-width:120px">ผลลัพธ์</th><th style="min-width:120px">งบ/ผู้ชนะ</th><th style="min-width:110px">วันที่</th></tr>`;
+  }else if(scope==='approvals'){
+    bar.innerHTML=`<input class="in in-text" id="lvQ" type="text" placeholder="ค้นหา AuctionID / ชื่องาน / ผู้ขออนุมัติ..." oninput="onListSearch()"><button class="btn btn-ghost" style="height:34px;padding:0 10px" onclick="clearListSearch()"><i class="ti ti-refresh"></i></button>`;
+    head.innerHTML=`<tr><th style="min-width:120px">รหัสการประมูล</th><th style="min-width:200px">ชื่อการประมูล</th><th style="min-width:170px">ประเภทการอนุมัติ</th><th style="min-width:170px">ผู้ขออนุมัติ</th><th style="min-width:110px">วันที่ขอ</th></tr>`;
+  }else{
+    bar.innerHTML=`<input class="in in-text" id="lvQ" type="text" placeholder="ค้นหา..." oninput="onListSearch()"><select class="in in-field" id="lvField" onchange="onListSearch()"><option value="all">All Fields</option><option value="auctionId">AuctionID</option><option value="format">Format</option><option value="type">Type</option><option value="name">Auction Name</option><option value="award">Award Status</option><option value="creator">Create by</option></select><input type="hidden" id="lvFrom"><input type="hidden" id="lvTo"><div class="date-dd-wrap"><button class="btn-datepick" id="lvDateBtn" onclick="toggleDatePicker('lv')"><span id="lvDateLabel">Select Date</span><i class="ti ti-chevron-down" style="font-size:13px"></i></button><div class="date-dd" id="lvDateDd" onclick="event.stopPropagation()"></div></div><button class="btn btn-ghost" style="height:34px;padding:0 10px" onclick="clearListSearch()"><i class="ti ti-refresh"></i></button>`;
+    head.innerHTML=`<tr><th style="min-width:128px">AuctionID</th><th style="min-width:120px">Format</th><th style="min-width:80px">Type</th><th style="min-width:190px">Auction Name</th><th style="min-width:190px">Status</th><th style="min-width:140px">Auction Date</th><th style="min-width:160px">Award Status</th><th style="min-width:110px">Create by</th></tr>`;
+  }
+}
+function loadList(){const ld=document.getElementById('loadList');ld.classList.add('show');setTimeout(()=>{
+  if(listScope==='history'){
+    let rows=approvalHistory.slice();const q=(val('lvQ')||'').toLowerCase(),ty=val('lvType'),rs=val('lvResult');
+    rows=rows.filter(h=>(!q||h.auctionId.toLowerCase().includes(q)||h.name.toLowerCase().includes(q))&&(ty==='all'||h.type===ty)&&(rs==='all'||h.result===rs));
+    const total=rows.length,totalPages=Math.max(1,Math.ceil(total/PAGE_SIZE));listPage=Math.min(listPage,totalPages);const pageRows=rows.slice((listPage-1)*PAGE_SIZE,(listPage-1)*PAGE_SIZE+PAGE_SIZE);
+    document.getElementById('lvTb').innerHTML=pageRows.length?pageRows.map(h=>{const tag=h.type==='setup'?`<span class="ap-type ap-setup"><i class="ti ti-clipboard-check"></i> อนุมัติจัดงาน</span>`:`<span class="ap-type ap-result"><i class="ti ti-trophy"></i> อนุมัติผล</span>`;const res=h.result==='approved'?`<span class="ap-res-ok"><i class="ti ti-check"></i> อนุมัติ</span>`:`<span class="ap-res-rej"><i class="ti ti-arrow-back-up"></i> ตีกลับ</span>`;const bw=h.winning?`${h.budget}→${h.winning} ลบ.`:`${h.budget} ลบ.`;return`<tr onclick="openDetail('${h.auctionId}')"><td class="td-mono">${h.auctionId}</td><td class="td-clamp" title="${h.name}">${h.name}</td><td>${tag}</td><td>${res}</td><td style="font-size:11px">${bw}</td><td style="font-size:11px;color:var(--muted)">${h.at}</td></tr>`;}).join(''):`<tr class="empty-row"><td colspan="6">ไม่พบประวัติ</td></tr>`;
+    document.getElementById('lvBadge').textContent=`${total} รายการ`;
+    renderPagination(document.getElementById('lvPgBtns'),document.getElementById('lvPgInfo'),{total,totalPages,page:listPage},p=>{listPage=p;loadList();});
+  }else if(listScope==='approvals'){
+    let rows=getApprovalTasks();const q=(val('lvQ')||'').toLowerCase();
+    if(q)rows=rows.filter(t=>t.auction.auctionId.toLowerCase().includes(q)||t.auction.name.toLowerCase().includes(q)||t.auction.creator.toLowerCase().includes(q));
+    const total=rows.length,totalPages=Math.max(1,Math.ceil(total/PAGE_SIZE));listPage=Math.min(listPage,totalPages);
+    const pageRows=rows.slice((listPage-1)*PAGE_SIZE,(listPage-1)*PAGE_SIZE+PAGE_SIZE);
+    document.getElementById('lvTb').innerHTML=pageRows.length?pageRows.map(apprRowTpl).join(''):`<tr class="empty-row"><td colspan="5"><i class="ti ti-circle-check" style="font-size:24px;color:var(--ok);display:block;margin-bottom:6px"></i>ไม่มีงานรออนุมัติ — เคลียร์หมดแล้ว 🎉</td></tr>`;
+    document.getElementById('lvBadge').textContent=`${total} รายการ`;
+    renderPagination(document.getElementById('lvPgBtns'),document.getElementById('lvPgInfo'),{total,totalPages,page:listPage},p=>{listPage=p;loadList();});
+  }else{
+    const res=queryAuctions({listScope,groupFilter:'',q:val('lvQ'),field:val('lvField'),from:val('lvFrom'),to:val('lvTo'),page:listPage});listPage=res.page;
+    document.getElementById('lvTb').innerHTML=res.rows.length?res.rows.map(a=>{const ph=auctionPhase(a);const rc=inAwardRejected(a)?'row-rej':(isActionItem(a)?'row-alert':(ph==='live'?'row-live':''));return`<tr class="${rc}" onclick="openDetail('${a.auctionId}')"><td class="td-mono">${a.auctionId}</td><td>${a.format}</td><td>${a.type}</td><td class="td-clamp" title="${a.name}">${a.name}</td><td>${statusPill(a)}</td><td>${dateCell(a)}</td><td>${awardChip(a)}</td><td>${a.creator}</td></tr>`;}).join(''):`<tr class="empty-row"><td colspan="8">ไม่พบรายการ</td></tr>`;
+    document.getElementById('lvBadge').textContent=`${res.total} รายการ`;
+    renderPagination(document.getElementById('lvPgBtns'),document.getElementById('lvPgInfo'),res,p=>{listPage=p;loadList();});
+  }
+  ld.classList.remove('show');},120);}
+function onListSearch(){clearTimeout(listTimer);listTimer=setTimeout(()=>{listPage=1;loadList();},300);}
+function clearListSearch(){['lvQ','lvFrom','lvTo'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});['lvField','lvType','lvResult'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='all';});delete datePickers.lv;const lbl=document.getElementById('lvDateLabel');if(lbl)lbl.textContent='Select Date';const btn=document.getElementById('lvDateBtn');if(btn)btn.classList.remove('selected');listPage=1;loadList();}
+
+function qaStats(no){const l=qaData[no]||[];const n=l.filter(x=>!x.a).length;return{total:l.length,pending:n,answered:l.length-n};}
+function renderQA(){
+  if(!hasRole('purchaser'))return;
+  const keys=Object.keys(qaData).sort((a,b)=>qaStats(b).pending-qaStats(a).pending);
+  const totalNew=keys.reduce((s,no)=>{const a=auctions.find(x=>x.auctionId===no);return s+((a&&qaBoardOpen(a))?qaStats(no).pending:0);},0);
+  const qaCnt=document.getElementById('tbQaCount');if(qaCnt){qaCnt.textContent=totalNew;qaCnt.className=`cnt ${totalNew===0?'cnt-green':'cnt-red'}`;}
+  const listEl=document.getElementById('ddQaList');if(!listEl)return;
+  listEl.innerHTML=keys.length?keys.map(no=>{const a=auctions.find(x=>x.auctionId===no);const open=a&&qaBoardOpen(a);const s=qaStats(no),nm=auctionName(no),latest=(qaData[no]&&qaData[no][0])?qaData[no][0].t:'';const pendingShown=open?s.pending:0;return`<div class="tb-dd-item" onclick="openQA('${no}');document.getElementById('ddQa').classList.remove('open')"><div class="tb-dd-dot" style="background:${pendingShown>0?'#D06A6A':'#7C7C7C'}"></div><div style="flex:1;min-width:0"><div class="tb-dd-name">${nm}</div><div class="tb-dd-id">${no}</div><div class="tb-dd-sub">${latest}</div></div>${pendingShown>0?`<span class="badge-small b-new">${pendingShown} ใหม่</span>`:''}</div>`;}).join(''):`<div style="padding:16px;text-align:center;font-size:12px;color:var(--muted)">ไม่มี Q&A</div>`;
+}
+function openQA(no){const list=qaData[no]||[],nm=auctionName(no);document.getElementById('qaModalTitle').textContent=nm;document.getElementById('qaModalBody').innerHTML=`<div class="qa-modal-sub"><i class="ti ti-hash" style="font-size:12px"></i> ${no} · คำถามทั้งหมด (${list.length} รายการ)</div>${list.map((item,i)=>`<div class="mini-q"><div class="mini-q-top"><span class="mini-q-user">${item.id}</span><span class="mini-q-time">${item.t}</span></div><div class="mini-q-text">${item.q}</div>${item.a?`<div class="mini-q-ans"><i class="ti ti-circle-check-filled"></i>${item.a}</div>`:`<div id="ans-${no}-${i}" class="mini-q-editor" contenteditable="true" data-placeholder="พิมพ์ข้อความคำตอบที่นี่..."></div><button id="sb-${no}-${i}" class="btn qa-send-btn btn-sm" style="margin-top:8px" onclick="submitQA('${no}',${i})"><i class="ti ti-send"></i> ส่งคำตอบ</button>`}</div>`).join('')}<div class="modal-actions"><button class="btn" onclick="closeModal('qaModal')">ปิด</button></div>`;openModal('qaModal');}
+async function submitQA(no,idx){const box=document.getElementById(`ans-${no}-${idx}`),btn=document.getElementById(`sb-${no}-${idx}`);if(!box||!btn)return;const v=(box.textContent||'').trim();if(!v){showToast('กรุณาพิมพ์คำตอบก่อนส่ง');return;}btn.disabled=true;btn.innerHTML=`<i class="ti ti-loader-2" style="animation:spin 1s linear infinite"></i> กำลังส่ง...`;await new Promise(r=>setTimeout(r,500));qaData[no][idx].a=v;showToast('ส่งคำตอบเรียบร้อย');openQA(no);renderQA();}
+
+function openDetail(id){
+  const a=auctions.find(x=>x.auctionId===id);if(!a)return;
+  const {dateStr,timeStr}=dtParts(a),ph=auctionPhase(a),ds=displayStatus(a);
+  document.getElementById('detailTitle').textContent=`${a.auctionId} · ${a.name}`;
+  let alertBox='';
+  const isApprover=hasRole('approver');const f=a.approvalFlow;
+  if(isApprover&&f&&(f.setup?.state==='pending'&&f.setup.approver===AP_ME())){
+    alertBox=`<div style="grid-column:1/-1;background:var(--purple-bg);border:1px solid var(--purple-bd);border-radius:12px;padding:13px"><div style="font-size:10px;font-weight:700;color:var(--purple-deep);display:flex;align-items:center;gap:5px;margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em"><i class="ti ti-clipboard-check"></i> รอคุณอนุมัติ: ให้จัดงาน · ผู้ขอ ${a.creator}</div><div style="font-size:12px;color:#6a4fa0">งานนี้รอการอนุมัติจากคุณเพื่อเปิดประมูล — กรุณาตรวจสอบในอีเมล/หน้างานแล้วอนุมัติ</div><button class="btn btn-purple btn-sm" style="margin-top:10px" onclick="showToast('เปิดหน้าอนุมัติ (ไปที่อีเมล/หน้างาน)...');closeModal('detailModal')"><i class="ti ti-external-link"></i> ไปหน้าอนุมัติ</button></div>`;
+  }else if(isApprover&&f&&(f.result?.state==='pending'&&f.result.approver===AP_ME())){
+    const sv=a.budget&&a.winning?(a.budget-a.winning).toFixed(1):null;
+    alertBox=`<div style="grid-column:1/-1;background:var(--purple-bg);border:1px solid var(--purple-bd);border-radius:12px;padding:13px"><div style="font-size:10px;font-weight:700;color:var(--purple-deep);display:flex;align-items:center;gap:5px;margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em"><i class="ti ti-trophy"></i> รอคุณอนุมัติ: ผลประมูล · ผู้ขอ ${a.creator}</div><div style="font-size:12px;color:#6a4fa0">ผู้ชนะเสนอ ${a.winning} ลบ.${sv?` (ประหยัด ${sv} ลบ.)`:''} — รอคุณอนุมัติผล</div><button class="btn btn-purple btn-sm" style="margin-top:10px" onclick="showToast('เปิดหน้าอนุมัติผล (ไปที่อีเมล/หน้างาน)...');closeModal('detailModal')"><i class="ti ti-external-link"></i> ไปหน้าอนุมัติผล</button></div>`;
+  }else if(inAwardRejected(a)){alertBox=`<div style="grid-column:1/-1;background:var(--orange-bg);border:1px solid var(--orange-bd);border-radius:12px;padding:13px"><div style="font-size:10px;font-weight:700;color:var(--orange);display:flex;align-items:center;gap:4px;margin-bottom:6px;text-transform:uppercase"><i class="ti ti-gavel"></i> ผลการ Award ถูกตีกลับ</div><div style="font-size:12px;color:#8a5a30">${a.rejectNote?`<b>เหตุผล:</b> ${a.rejectNote}`:'ผู้อนุมัติไม่อนุมัติผล'}</div></div>`;}
+  else if(ph==='live'){alertBox=`<div style="grid-column:1/-1;background:var(--ok-bg);border:1px solid var(--ok-bd);border-radius:12px;padding:13px"><div style="font-size:10px;font-weight:700;color:var(--ok);display:flex;align-items:center;gap:5px;margin-bottom:6px;text-transform:uppercase"><span class="live-dot"></span> Live</div><div style="font-size:12px;color:#17794C">ประมูลเปิดอยู่ตอนนี้ (${timeStr})</div></div>`;}
+  else if(ph==='scheduled'){alertBox=`<div style="grid-column:1/-1;background:var(--blue-bg);border:1px solid var(--blue-bd);border-radius:12px;padding:13px"><div style="font-size:10px;font-weight:700;color:var(--blue);display:flex;align-items:center;gap:5px;margin-bottom:6px;text-transform:uppercase"><i class="ti ti-calendar-clock"></i> รอเปิดประมูล</div><div style="font-size:12px;color:#3a5db8">กำหนด ${dateStr} ${timeStr}</div></div>`;}
+  else if(a.infoRequest){alertBox=`<div style="grid-column:1/-1;background:var(--danger-bg);border:1px solid var(--danger-bd);border-radius:12px;padding:13px"><div style="font-size:10px;font-weight:700;color:var(--danger);display:flex;align-items:center;gap:4px;margin-bottom:6px;text-transform:uppercase"><i class="ti ti-alert-circle"></i> Commercial Info Request</div><div style="font-size:12px;color:#8a4444">${a.infoRequest}</div></div>`;}
+  else if(a.status==='Cancelled'){alertBox=`<div style="grid-column:1/-1;background:#F4F5F8;border:1px solid #E6E8EB;border-radius:12px;padding:13px"><div style="font-size:10px;font-weight:700;color:#7C7C7C;display:flex;align-items:center;gap:4px;margin-bottom:6px;text-transform:uppercase"><i class="ti ti-ban"></i> งานถูกยกเลิก</div><div style="font-size:12px;color:#7C7C7C"><b>เหตุผล:</b> ${cancelReasonText(a)}${a.cancelNote?`<br><b>หมายเหตุ:</b> ${a.cancelNote}`:''}</div></div>`;}
+  const savings=a.budget&&a.winning?(a.budget-a.winning).toFixed(1):null;
+  document.getElementById('detailGrid').innerHTML=`${alertBox}<div class="d-box"><div class="d-key">Format</div><div class="d-val">${a.format}</div></div><div class="d-box"><div class="d-key">Type</div><div class="d-val">${a.type}</div></div><div class="d-box"><div class="d-key">Status</div><div class="d-val"><span class="pill ${statusClass[ds]||'st-draft'}">${ds}</span></div></div><div class="d-box"><div class="d-key">Award Status</div><div class="d-val">${awardChip(a)}</div></div><div class="d-box"><div class="d-key">Auction Date</div><div class="d-val">${dateStr} · ${timeStr}</div></div><div class="d-box"><div class="d-key">งบประมาณ</div><div class="d-val">${a.budget?a.budget+' ลบ.':'—'}</div></div><div class="d-box"><div class="d-key">ราคาปิด / Savings</div><div class="d-val">${a.winning?a.winning+' ลบ. (ประหยัด '+savings+' ลบ.)':'—'}</div></div><div class="d-box"><div class="d-key">ผู้เข้าร่วม</div><div class="d-val">${a.bidders||0} ราย</div></div>`;
+  const apInfo=f?`<div class="t-row"><span class="t-left">อนุมัติจัดงาน</span><span class="t-right">${f.setup?.state||'-'}</span></div><div class="t-row"><span class="t-left">อนุมัติผล</span><span class="t-right">${f.result?.state||'-'}</span></div>`:'';
+  document.getElementById('detailTimeline').innerHTML=`<div class="t-row"><span class="t-left">สร้างงาน</span><span class="t-right">${a.creator}</span></div><div class="t-row"><span class="t-left">กำหนดประมูล</span><span class="t-right">${dateStr} ${timeStr}</span></div>${apInfo}<div class="t-row"><span class="t-left">Status</span><span class="t-right">${ds}</span></div>`;
+  openModal('detailModal');
+}
+
+function openModal(id){document.getElementById(id).classList.add('open')}
+function closeModal(id){document.getElementById(id).classList.remove('open')}
+function closeIfOverlay(e,id){if(e.target===document.getElementById(id))closeModal(id)}
+function showToast(msg){const t=document.getElementById('toast');document.getElementById('toastMsg').textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400);}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal('detailModal');closeModal('qaModal');}});
+function toggleDd(id){document.getElementById(id).classList.toggle('open');}
+document.addEventListener('click',e=>{if(!e.target.closest('.dd-wrap'))document.querySelectorAll('.tb-dropdown').forEach(d=>d.classList.remove('open'));});
+
+function renderActionBar(){
+  const badges=document.getElementById('roleBadges');
+  const roleLabels=CU().roles.map(r=>r==='purchaser'?'Purchaser':'Approver');
+  badges.innerHTML=`Your role: ${roleLabels.join(', ')}`;
+  const right=document.getElementById('actionRight');let html='';
+  if(hasRole('purchaser')){
+    html+=`<button class="btn btn-create" onclick="showToast('เปิดฟอร์มสร้างงานใหม่...')"><i class="ti ti-plus"></i> สร้างงานใหม่</button>`;
+  }else{
+    html+=`<span style="font-size:11px;color:var(--muted)"><i class="ti ti-gavel"></i> โหมดผู้อนุมัติ</span>`;
+  }
+  right.innerHTML=html;
+}
+
+function setScope(s){anScope=s;document.querySelectorAll('#scopeSeg button').forEach(b=>b.classList.toggle('active',b.dataset.scope===s));renderDashboard();}
+function switchUser(key){currentUserKey=key;anScope='mine';groupFilter='';mainPage=1;analyticsView='created';document.getElementById('tbAvatar').textContent=CU().initials;document.querySelectorAll('#scopeSeg button').forEach(b=>b.classList.toggle('active',b.dataset.scope==='mine'));renderAll();}
+
+/* [PATCH 3+4] renderDashboard */
+function renderDashboard(){
+  renderKpiGroup();
+  const mainCol=document.getElementById('mainCol');
+  const sideCol=document.getElementById('sideCol');
+  const apprSlot=document.getElementById('approvalWidgetSlot');
+  const layoutRow=document.getElementById('layoutRow');
+  const isPurchaser=hasRole('purchaser'),isApprover=hasRole('approver'),both=isPurchaser&&isApprover;
+  const isApproverOnly=isApprover&&!isPurchaser;
+  apprSlot.innerHTML='';
+
+  /* [PATCH] งานที่ต้องอนุมัติ อยู่แถวบนสุดของ main-col (แถวเดียวกับงานที่กำลังจะมาถึงใน side-col) */
+  let mainHtml='';
+  if(isApprover)mainHtml+=renderApprovalWidget();
+  if(!isApproverOnly)mainHtml+=renderMainTable();
+  mainCol.innerHTML=mainHtml;
+
+  // side column
+  let sideHtml='';
+  if(isPurchaser)sideHtml+=renderUpcomingWidget();
+  if(!isApproverOnly)sideHtml+=renderQuickActionWidget();
+  sideCol.innerHTML=sideHtml;
+
+  // approver-only: no side column (full width main)
+  if(isApproverOnly){layoutRow.classList.add('no-side');}else{layoutRow.classList.remove('no-side');}
+
+  renderAnalyticsShell();
+  if(isPurchaser){loadMain();}
+  renderQA();
+}
+function renderAll(){renderActionBar();renderDashboard();renderNotif();}
+renderAll();
+</script>
+</body>
+</html>
