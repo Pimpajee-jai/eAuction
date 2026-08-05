@@ -333,6 +333,17 @@ tbody tr.row-appr td:first-child{border-left:3px solid transparent}
 .legend-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;justify-content:center}
 .lg-chip{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:600;color:var(--muted)}
 .lg-dot{width:9px;height:9px;border-radius:3px;flex-shrink:0}
+.rw-scroll{max-height:250px;overflow-y:auto;padding:2px 2px 2px 0;display:flex;flex-direction:column;gap:9px}
+.rw-scroll::-webkit-scrollbar{width:7px}
+.rw-scroll::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:6px}
+.rw-row{display:grid;grid-template-columns:150px 1fr auto;align-items:center;gap:10px}
+.rw-name{font-size:11.5px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:6px}
+.rw-rank{font-size:10px;font-weight:700;color:var(--muted);flex-shrink:0;width:20px}
+.rw-track{background:#eef3fa;border-radius:6px;height:16px;overflow:hidden}
+.rw-bar{height:100%;background:var(--primary);border-radius:6px;min-width:4px;transition:width .3s}
+.rw-val{font-size:11.5px;font-weight:700;color:var(--text);min-width:44px;text-align:right}
+.rw-empty{padding:34px 15px;text-align:center;color:var(--muted);font-size:12px;display:flex;flex-direction:column;align-items:center;gap:8px}
+.rw-empty i{font-size:28px;color:var(--line-2)}
 
 .overlay{display:none;position:fixed;inset:0;background:rgba(40,60,100,.42);z-index:300;align-items:center;justify-content:center;padding:22px;backdrop-filter:blur(4px)}
 .overlay.open{display:flex}
@@ -807,7 +818,7 @@ function renderAnalyticsShell(){
   const title=onlyApprover?'ภาพรวมการอนุมัติ':'ภาพรวมการประมูล';
   let toggle='';
   if(showToggle)toggle=`<div class="an-viewseg"><button class="${analyticsView==='created'?'active':''}" data-view="created" onclick="setAnalyticsView('created')">งานที่ฉันเปิด</button><button class="${analyticsView==='approved'?'active':''}" data-view="approved" onclick="setAnalyticsView('approved')">งานที่ฉันอนุมัติ</button></div>`;
-  slot.innerHTML=`<div class="an-head"><div class="an-title">${title}</div><div class="an-controls">${toggle}<div class="seg" id="rangeSeg"><button data-range="3" onclick="setRange(3)">3 เดือน</button><button data-range="6" onclick="setRange(6)">6 เดือน</button><button class="active" data-range="12" onclick="setRange(12)">12 เดือน</button></div></div></div><div class="kpi-grid" id="anKpi"></div><div class="chart-grid"><div class="chart-card"><div class="chart-h" id="chSavH"></div><div class="chart-body"><div class="chart-box"><canvas id="chSavings"></canvas></div></div></div><div class="chart-card"><div class="chart-h" id="chOutH"></div><div class="chart-body"><div class="chart-box sm"><canvas id="chOutcome"></canvas></div><div class="legend-row" id="outcomeLegend"></div></div></div></div>`;
+  slot.innerHTML=`<div class="an-head"><div class="an-title">${title}</div><div class="an-controls">${toggle}<div class="seg" id="rangeSeg"><button data-range="3" onclick="setRange(3)">3 เดือน</button><button data-range="6" onclick="setRange(6)">6 เดือน</button><button class="active" data-range="12" onclick="setRange(12)">12 เดือน</button></div></div></div><div class="kpi-grid" id="anKpi"></div><div class="chart-grid"><div class="chart-card"><div class="chart-h" id="chSavH"></div><div class="chart-body"><div class="chart-box"><canvas id="chSavings"></canvas></div></div></div><div class="chart-card"><div class="chart-h" id="chOutH"></div><div class="chart-body"><div class="chart-box sm"><canvas id="chOutcome"></canvas></div><div class="legend-row" id="outcomeLegend"></div></div></div></div><div class="chart-card" style="margin-bottom:10px"><div class="chart-h"><div class="t">Top 20 ผู้ขายได้งานมากสุด (Repeat Winners)</div><div class="sub">เรียงจากมากไปน้อย · แสดงสูงสุด 20 ราย</div></div><div class="chart-body"><div class="rw-scroll" id="repeatWinners"></div></div></div>`;
   renderAnalytics();
 }
 function setAnalyticsView(v){analyticsView=v;document.querySelectorAll('.an-viewseg button').forEach(b=>b.classList.toggle('active',b.dataset.view===v));renderAnalytics();}
@@ -839,10 +850,18 @@ function analyticsData(){
     }else if(a.award==='no-result')oc_nr++;else if(a.award==='insufficient')oc_in++;else if(a.award==='no-award')oc_na++;if(a.award==='rejected')rejected++;if(a.bidders>0){bidSum+=a.bidders;bidCnt++;}});
   const avgDaysBy={};months.forEach(m=>{avgDaysBy[m.key]=daysCntBy[m.key]?+(daysSumBy[m.key]/daysCntBy[m.key]).toFixed(1):0;});
   const succDenom=oc_c+oc_nr+oc_in+oc_na,succRate=succDenom>0?Math.round(oc_c/succDenom*100):0,avgBid=bidCnt>0?(bidSum/bidCnt).toFixed(1):0,savPct=totalBudgetAw>0?Math.round(totalSav/totalBudgetAw*100):0;
-  return{months,savBy,volBy,apprBy,rejBy,avgDaysBy,winSrc,totalSav,totalSpend,succRate,succDenom,avgBid,savPct,rejected,approvedCount:oc_c,outcome:{complete:oc_c,noresult:oc_nr,insufficient:oc_in,noaward:oc_na}};
+  return{months,savBy,volBy,apprBy,rejBy,avgDaysBy,winSrc,repeatWinners:repeatWinnersMock(oc_c),totalSav,totalSpend,succRate,succDenom,avgBid,savPct,rejected,approvedCount:oc_c,outcome:{complete:oc_c,noresult:oc_nr,insufficient:oc_in,noaward:oc_na}};
+}
+/* [MOCK] Top 20 ผู้ขายได้งานมากสุด — ไล่จาก 12 งานลงมาถึง 1 งาน; ถ้ามีงานสำเร็จน้อยกว่า 20 ราย แสดงเท่าที่มี */
+const RW_SELLERS=['บจก. ไทยเทค เอ็นจิเนียริ่ง','บจก. สยามซัพพลาย','หจก. รุ่งเรืองพาณิชย์','บจก. เอเชีย โลจิสติกส์','บจก. โกลบอล พาร์ทเนอร์','บจก. เมโทร อินดัสทรี','หจก. ศรีไทยการช่าง','บจก. ยูนิเวอร์แซล เทรดดิ้ง','บจก. พีทีเอ็น เซอร์วิส','บจก. เนชั่นแนล ซัพพลาย','หจก. ทรัพย์เจริญ','บจก. อีสเทิร์น เอ็นเนอร์ยี่','บจก. เวสเทิร์น กรุ๊ป','บจก. ไพร์ม โซลูชั่น','หจก. บวรวัฒนา','บจก. ควอลิตี้ พลัส','บจก. แอดวานซ์ แมททีเรียล','บจก. เซ็นทรัล ทูลส์','หจก. ไทยรุ่งโรจน์','บจก. ฟาสต์ฟอร์เวิร์ด'];
+function repeatWinnersMock(completeCount){
+  if(!completeCount)return[];
+  const n=Math.min(20,completeCount);
+  return RW_SELLERS.slice(0,n).map((name,i)=>({name,jobs:Math.max(1,12-i)}));
 }
 function renderAnalytics(){
   const D=analyticsData(),isAppr=analyticsView==='approved';
+  renderRepeatWinners(D.repeatWinners);
   const kpi=document.getElementById('anKpi');
   if(isAppr){
     kpi.innerHTML=`<div class="kpi"><div><span class="kpi-val">${D.approvedCount}</span><span class="kpi-unit">งาน</span></div><div class="kpi-label">อนุมัติผ่าน (ในช่วง)</div><div class="kpi-delta" style="color:var(--muted)"><i class="ti ti-gavel"></i> ผ่านการอนุมัติของฉัน</div></div><div class="kpi"><div><span class="kpi-val">${(D.totalSpend).toFixed(1)}</span><span class="kpi-unit">ลบ.</span></div><div class="kpi-label">มูลค่าที่อนุมัติ</div><div class="kpi-delta" style="color:var(--muted)"><i class="ti ti-receipt"></i> ราคาปิดรวม</div></div><div class="kpi"><div><span class="kpi-val">${D.totalSav.toFixed(1)}</span><span class="kpi-unit">ลบ.</span></div><div class="kpi-label">Savings ที่ผ่านมือ</div><div class="kpi-delta delta-up"><i class="ti ti-trending-up"></i> ${D.savPct}% จากงบ</div></div><div class="kpi"><div><span class="kpi-val">${D.rejected}</span><span class="kpi-unit">งาน</span></div><div class="kpi-label">ตีกลับ (ในช่วง)</div><div class="kpi-delta" style="color:var(--muted)"><i class="ti ti-shield-check"></i> คุมคุณภาพ</div></div>`;
@@ -891,6 +910,13 @@ function renderAnalytics(){
   chOutcome=new Chart(document.getElementById('chOutcome'),{type:'doughnut',data:{labels:ocLabels,datasets:[{data:ocData,backgroundColor:ocColors,borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,cutout:'64%',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>{const tot=ocData.reduce((s,x)=>s+x,0),pct=tot?Math.round(c.parsed/tot*100):0;return ` ${c.label}: ${c.parsed} งาน (${pct}%)`;}}}}}});
   }catch(e){console.warn('Chart render skipped (chOutcome):',e);}
   document.getElementById('outcomeLegend').innerHTML=ocLabels.map((l,i)=>ocData[i]?`<span class="lg-chip"><span class="lg-dot" style="background:${ocColors[i]}"></span>${l} (${ocData[i]})</span>`:'').join('');
+}
+function renderRepeatWinners(list){
+  const box=document.getElementById('repeatWinners');
+  if(!box)return;
+  if(!list||!list.length){box.innerHTML=`<div class="rw-empty"><i class="ti ti-mood-empty"></i><span>ยังไม่มีข้อมูลผู้ชนะในช่วงเวลานี้</span></div>`;return;}
+  const max=list[0].jobs;
+  box.innerHTML=list.map((s,i)=>`<div class="rw-row"><div class="rw-name"><span class="rw-rank">#${i+1}</span><span title="${s.name}">${s.name}</span></div><div class="rw-track"><div class="rw-bar" style="width:${Math.max(4,Math.round(s.jobs/max*100))}%"></div></div><div class="rw-val">${s.jobs} งาน</div></div>`).join('');
 }
 
 /* ===== LIST VIEW ===== */
