@@ -22,6 +22,7 @@
   --orange:#F27326;--orange-bg:#FEF6EA;--orange-bd:#E5C185;
   --purple:#8B5CF6;--purple-deep:#7C3AED;--purple-bg:#EDE9FE;--purple-bg-2:#F5F3FF;--purple-bg-3:#EEF2FF;--purple-bd:#8B5CF6;
   --blue:#2F80ED;--blue-bg:#EEF2FF;--blue-bd:#0C56C9;
+  --link:#027BE0;--link-bg:#EEF2FF;--link-bd:#D4E8FC;
   --teal:#06B6D4;--teal-bg:#E0F2FE;--teal-bd:#06B6D4;
   --shadow-xs:0 1px 3px rgba(0,0,0,.03);
   --shadow-sm:0 2px 8px rgba(0,0,0,.04),0 1px 3px rgba(0,0,0,.03);
@@ -82,7 +83,7 @@ body{font-family:'Sarabun','Inter',system-ui,sans-serif;background:var(--bg);col
 .qa-dd-dot{width:8px;height:8px;border-radius:50%;background:var(--danger);flex-shrink:0;margin-top:5px}
 .qa-dd-info{flex:1;min-width:0}
 .qa-dd-name{font-size:14px;font-weight:700;color:var(--text)}
-.qa-dd-id{font-size:13px;color:var(--brand-mid);font-weight:600;margin-top:2px}
+.qa-dd-id{font-size:13px;color:var(--muted);font-weight:500;margin-top:2px}
 .qa-dd-time{font-size:12px;color:var(--muted);margin-top:4px}
 .qa-dd-badge{font-size:11px;font-weight:600;padding:2px 9px;border-radius:6px;background:var(--danger-bg);color:var(--danger-2);border:1px solid var(--danger-lt);flex-shrink:0}
 
@@ -153,7 +154,10 @@ body{font-family:'Sarabun','Inter',system-ui,sans-serif;background:var(--bg);col
 .gcard.active-card{border-color:var(--primary);box-shadow:0 0 0 2px rgba(12,86,201,.14) inset}
 .gcard .accent{position:absolute;inset:0 auto 0 0;width:4px;height:100%;border-radius:14px 0 0 14px}
 .gc-num{font-size:26px;font-weight:700;line-height:1;color:var(--text)}
-.gc-top{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.list-back{display:inline-flex;align-items:center;gap:6px;margin:16px 0 12px;font-size:13px;font-weight:600;color:var(--link);cursor:pointer;user-select:none}
+.list-back:hover{text-decoration:underline}
+.gc-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.gc-ic{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;background:color-mix(in srgb, currentColor 12%, #fff)}
 .gc-badge{width:20px;height:20px;border-radius:50%;background:#FDECEC;color:var(--danger);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
 .gc-label{font-size:14px;font-weight:600;line-height:1.3;margin-top:2px}
 .gc-label.c-danger{color:var(--danger)}
@@ -181,8 +185,10 @@ body{font-family:'Sarabun','Inter',system-ui,sans-serif;background:var(--bg);col
 .in-field{width:150px}
 
 /* Date range picker */
-.date-btn{height:36px;padding:0 12px;border-radius:8px;border:1px solid var(--primary);background:var(--primary);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:8px}
-.date-btn.has-val{background:var(--primary-deep)}
+.date-btn{height:36px;padding:0 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--text);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:8px;transition:.15s}
+.date-btn:hover{border-color:var(--primary)}
+.date-btn.has-val{border-color:var(--primary);background:var(--primary);color:#fff}
+.date-btn.has-val:hover{background:var(--primary-deep)}
 .date-btn i{font-size:15px}
 .dp-pop{position:absolute;top:calc(100% + 6px);right:20px;width:600px;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow-lg);z-index:200;display:none;padding:20px}
 .dp-pop.open{display:block}
@@ -219,7 +225,7 @@ tbody tr.row-alert td:first-child{border-left-color:var(--danger)}
 tbody tr.row-live td:first-child{border-left-color:var(--ok)}
 tbody tr.row-rej td:first-child{border-left-color:var(--orange)}
 tbody tr.row-appr td:first-child{border-left-color:var(--purple)}
-.td-mono{font-family:'Inter';font-size:13px;color:var(--brand-mid);font-weight:600}
+.td-mono{font-family:'Inter';font-size:13px;color:var(--text);font-weight:500}
 .td-clamp{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px}
 .date-main{font-weight:500}
 .date-time{font-size:12px;color:var(--muted);font-family:'Inter';margin-top:2px}
@@ -229,9 +235,9 @@ tbody tr.row-appr td:first-child{border-left-color:var(--purple)}
 .loading-overlay.show{display:flex}
 .col-creator.hide-col{display:none}
 
-.ap-type{display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 11px;border-radius:999px;font-size:13px;font-weight:500;border:none;white-space:nowrap;background:#F1F2F4;color:#5E5E5E}
-.ap-setup{background:#F1F2F4;color:#5E5E5E}
-.ap-result{background:#F1F2F4;color:#5E5E5E}
+.ap-type{display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 11px;border-radius:999px;font-size:13px;font-weight:600;border:none;white-space:nowrap}
+.ap-setup{background:var(--link-bg);color:var(--link);border:1px solid var(--link-bd)}
+.ap-result{background:var(--purple-bg);color:var(--purple-deep);border:1px solid var(--purple-bd)}
 .ap-go{color:var(--purple-deep);font-size:16px}
 .ap-res-ok{background:var(--ok-bg-2);color:var(--ok);border:1px solid var(--ok-lt);padding:2px 9px;border-radius:6px;font-size:12px;font-weight:600}
 .ap-res-rej{background:var(--orange-bg);color:var(--orange);border:1px solid var(--orange-bd);padding:2px 9px;border-radius:6px;font-size:12px;font-weight:600}
@@ -255,7 +261,7 @@ tbody tr.row-appr td:first-child{border-left-color:var(--purple)}
 .qa-item:last-child{margin-bottom:0}
 .qa-item:hover{box-shadow:var(--shadow-xs);transform:translateY(-1px)}
 .qa-ic{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;color:#fff}
-.qa-ic-all{background:var(--primary)}
+.qa-ic-all{background:var(--link)}
 .qa-ic-complete{background:var(--ok-2)}
 .qa-ic-cancel{background:var(--muted-2)}
 .qa-ic-history{background:var(--purple)}
@@ -263,7 +269,7 @@ tbody tr.row-appr td:first-child{border-left-color:var(--purple)}
 .qa-title{font-size:13px;font-weight:600;color:var(--text)}
 .qa-desc{font-size:12px;color:var(--muted);margin-top:1px}
 .qa-num{font-family:'Inter';font-size:20px;font-weight:700;line-height:1}
-.qa-num-all{color:var(--primary)}
+.qa-num-all{color:var(--link)}
 .qa-num-complete{color:var(--ok)}
 .qa-num-cancel{color:var(--text-2)}
 .qa-num-history{color:var(--purple-deep)}
@@ -384,7 +390,7 @@ tbody tr.row-appr td:first-child{border-left-color:var(--purple)}
         </select>
       </div>
       <div class="tb-dd-wrap">
-        <button class="tb-icon-btn" onclick="toggleDD('notifDD',event)"><i class="ti ti-bell"></i><span class="tb-badge" id="notifBadge">2</span></button>
+        <button class="tb-icon-btn" onclick="toggleDD('notifDD',event)"><i class="ti ti-bell-filled"></i><span class="tb-badge" id="notifBadge">2</span></button>
         <div class="tb-dd" id="notifDD">
           <div class="tb-dd-head"><span class="t">การแจ้งเตือนล่าสุด</span><span class="mark" onclick="markAllRead()">Mark all as read</span></div>
           <div class="tb-dd-tabs">
@@ -395,9 +401,9 @@ tbody tr.row-appr td:first-child{border-left-color:var(--purple)}
         </div>
       </div>
       <div class="tb-dd-wrap">
-        <button class="tb-icon-btn" onclick="toggleDD('qaDD',event)"><i class="ti ti-message-2"></i><span class="tb-badge blue" id="qaBadge">2</span></button>
+        <button class="tb-icon-btn" onclick="toggleDD('qaDD',event)"><i class="ti ti-message-question"></i><span class="tb-badge blue" id="qaBadge">2</span></button>
         <div class="tb-dd" id="qaDD">
-          <div class="tb-dd-head"><span class="t">Q&A BOARD</span></div>
+          <div class="tb-dd-head"><span class="t"><i class="ti ti-message-question" style="color:var(--link)"></i> Q&A BOARD</span></div>
           <div class="tb-dd-body" id="qaDDBody"></div>
         </div>
       </div>
@@ -486,7 +492,7 @@ tbody tr.row-appr td:first-child{border-left-color:var(--purple)}
   <!-- ANALYTICS -->
   <div class="analytics">
     <div class="an-head">
-      <div class="an-title"><i class="ti ti-chart-bar" style="color:var(--primary)"></i> ภาพรวมการประมูล</div>
+      <div class="an-title"><i class="ti ti-chart-bar" style="color:var(--link)"></i> ภาพรวมการประมูล</div>
       <div class="an-controls">
         <div class="an-viewseg" id="anViewSeg"></div>
         <div class="an-viewseg" id="rangeSeg">
@@ -517,6 +523,32 @@ tbody tr.row-appr td:first-child{border-left-color:var(--purple)}
   <div style="margin-top:6px">หน้านี้เป็น placeholder — เนื้อหาเพิ่มเติมภายหลัง</div>
 </div>
 
+<!-- ===== LIST VIEW (filterable) ===== -->
+<div class="container hidden" id="listView">
+  <div class="list-back" onclick="backFromList()"><i class="ti ti-arrow-left"></i> กลับสู่ Overview</div>
+  <div class="card" id="listCard">
+    <div class="card-header">
+      <div class="card-title"><i class="ti ti-list-details" style="color:var(--link)"></i> <span id="listViewTitle">รายการ</span></div>
+      <span class="hcount" id="listViewCount">0 รายการ</span>
+    </div>
+    <div class="search-bar">
+      <input class="in in-text" id="listSearch" placeholder="ค้นหา..." oninput="onListQuery()"/>
+      <select class="in in-field" id="listField" onchange="onListQuery()">
+        <option value="all">All Fields</option><option value="id">Auction ID</option><option value="name">Auction Name</option>
+      </select>
+      <select class="in in-field" id="listStatus" onchange="onListQuery()"></select>
+      <button class="date-btn" id="dateBtnList" onclick="toggleDatePicker('list',event)"><i class="ti ti-calendar"></i> <span id="dateLblList">Select Date</span></button>
+      <button class="btn btn-ghost" onclick="resetListFilters()"><i class="ti ti-refresh"></i></button>
+      <div class="dp-pop" id="dpList"></div>
+    </div>
+    <div class="table-wrap" id="listViewTableWrap"></div>
+    <div class="pagination">
+      <div class="pg-info" id="listPgInfo"></div>
+      <div class="pg-btns" id="listPgBtns"></div>
+    </div>
+  </div>
+</div>
+
 <!-- ===== MODALS ===== -->
 <div class="overlay" id="detailOverlay" onclick="if(event.target===this)closeModal('detailOverlay')">
   <div class="modal">
@@ -530,13 +562,6 @@ tbody tr.row-appr td:first-child{border-left-color:var(--purple)}
     <div class="modal-body" id="qaModalBody"></div>
   </div>
 </div>
-<div class="overlay" id="listOverlay" onclick="if(event.target===this)closeModal('listOverlay')">
-  <div class="modal" style="max-width:960px">
-    <div class="modal-header"><div class="modal-title" id="listTitle"></div><button class="btn-icon" onclick="closeModal('listOverlay')"><i class="ti ti-x"></i></button></div>
-    <div class="modal-body" id="listBody" style="padding:0"></div>
-  </div>
-</div>
-
 <div class="toast" id="toast"><i class="ti ti-circle-check"></i> <span id="toastMsg"></span></div>
 <script>
 /* ===== DATA ===== */
@@ -554,12 +579,14 @@ const auctions=[
  {id:'EA-2025-0118',fmt:'English',type:'Reverse',name:'Boiler Tube Replacement Q4',creator:'somchai',status:'Awaiting Approval',award:null,infoReq:false,end:'2026-09-05',req:'2026-07-28'},
  {id:'EA-2025-0018',fmt:'Sealed (Multi)',type:'Reverse',name:'Safety Equipment 2025',creator:'somchai',status:'Rejected by Approver',award:null,infoReq:false,end:'2026-08-10',req:'2026-07-25'},
  {id:'EA-2025-0037',fmt:'Sealed (Multi)',type:'Reverse',name:'Racking System 2025',creator:'wipa',status:'PTVN Review',award:null,infoReq:true,overdue:false,end:'2026-08-20',req:'2026-07-30'},
+ {id:'EA-2025-0038',fmt:'English',type:'Reverse',name:'Warehouse Shelving 2025',creator:'somchai',status:'PTVN Review',award:null,infoReq:false,end:'2026-08-22',req:'2026-07-31'},
  {id:'EA-2025-0045',fmt:'English (Multi)',type:'Reverse',name:'Conveyor Belt 2025',creator:'somchai',status:'Rejected by PTVN',award:null,infoReq:false,end:'2026-08-15',req:'2026-07-22'},
  {id:'EA-2025-0051',fmt:'English',type:'Reverse',name:'HVAC Maintenance 2026',creator:'wipa',status:'PTVN Review',award:null,infoReq:true,overdue:true,end:'2026-08-18',req:'2026-07-15'},
  {id:'EA-2026-0130',fmt:'English',type:'Reverse',name:'Steam Turbine Overhaul 2026',creator:'somchai',status:'Active',award:null,infoReq:false,end:'2026-08-30',live:true,req:'2026-07-10'},
+ {id:'EA-2026-0129',fmt:'English',type:'Reverse',name:'Cooling Tower Service 2026',creator:'somchai',status:'Active',award:null,infoReq:false,end:'2026-09-10',live:false,req:'2026-07-09'},
  {id:'EA-2026-0131',fmt:'MVB',type:'Reverse',name:'Annual Bearing Supply 2026',creator:'somchai',status:'Active',award:null,infoReq:false,end:'2026-08-30',live:true,req:'2026-07-11'},
  {id:'EA-2026-0134',fmt:'Sealed',type:'Reverse',name:'Safety Equipment Bulk 2026',creator:'wipa',status:'Closed',award:'awaiting_winner',infoReq:false,end:'2026-07-30',req:'2026-07-01'},
- {id:'EA-2026-0135',fmt:'English',type:'Reverse',name:'Pump Procurement Q1 2026',creator:'somchai',status:'Active',award:'awaiting_approval',infoReq:false,end:'2026-07-31',req:'2026-07-02'},
+ {id:'EA-2026-0135',fmt:'English',type:'Reverse',name:'Pump Procurement Q1 2026',creator:'somchai',status:'Closed',award:'awaiting_approval',infoReq:false,end:'2026-07-31',req:'2026-07-02'},
  {id:'EA-2026-0140',fmt:'MVB',type:'Reverse',name:'Valve Supply Contract 2026',creator:'somchai',status:'Complete',award:'awarded',infoReq:false,end:'2026-07-20',req:'2026-06-15'},
  {id:'EA-2026-0141',fmt:'English',type:'Reverse',name:'Cable Tray 2026',creator:'wipa',status:'Closed',award:'rejected',infoReq:false,end:'2026-07-18',req:'2026-06-20'},
  {id:'EA-2026-0142',fmt:'Sealed',type:'Reverse',name:'Motor Rewinding 2026',creator:'somchai',status:'Canceled',award:null,manualCancel:true,end:'2026-07-10',req:'2026-06-10'},
@@ -650,11 +677,11 @@ function renderKPI(){
   let html='';
   if(u.roles.includes('purchaser')){
     html+=`<div class="kpi-block"><div class="kpi-block-label">ในฐานะผู้จัดประมูล</div><div class="kpi-cards n5">
-      ${kpiCard('action',cnt('action'),'Action Required','Draft · Rejected · PTDR',true,'var(--danger)')}
-      ${kpiCard('inApproval',cnt('inApproval'),'Awaiting Response','Q&A Board',true,'var(--danger)')}
-      ${kpiCard('active',cnt('active'),'Active','Released · In Auction',false,'var(--ok-2)')}
-      ${kpiCard('awaitingAward',cnt('awaitingAward'),'Awaiting Award','Result sent back',false,'var(--primary)')}
-      ${kpiCard('awardRejected',cnt('awardRejected'),'Award Rejected','Direct · Auction',false,'var(--orange)')}
+      ${kpiCard('action',cnt('action'),'Action Required','Draft · Rejected · PTDR',true,'var(--danger)','ti-alert-triangle')}
+      ${kpiCard('inApproval',cnt('inApproval'),'Awaiting Response','Q&A Board',true,'var(--danger)','ti-message-question')}
+      ${kpiCard('active',cnt('active'),'Active','Released · In Auction',false,'var(--ok-2)','ti-gavel')}
+      ${kpiCard('awaitingAward',cnt('awaitingAward'),'Awaiting Award','Result sent back',false,'var(--link)','ti-trophy')}
+      ${kpiCard('awardRejected',cnt('awardRejected'),'Award Rejected','Direct · Auction',false,'var(--orange)','ti-circle-x')}
     </div></div>`;
   }
   if(u.roles.includes('approver')){
@@ -663,17 +690,17 @@ function renderKPI(){
     const onlyAppr=!u.roles.includes('purchaser');
     if(u.roles.includes('purchaser')) html+=`<div class="kpi-divider-v"></div>`;
     html+=`<div class="kpi-block" style="${onlyAppr?'':'max-width:'+(onlyAppr?'100%':'420px')}"><div class="kpi-block-label l-approver">ในฐานะผู้อนุมัติ</div><div class="kpi-cards ${onlyAppr?'n5':'n2'}">
-      ${kpiCard(null,setup,'รออนุมัติให้จัดงาน','ก่อนเปิดประมูล',false,'var(--purple-deep)')}
-      ${kpiCard(null,result,'รออนุมัติผลประมูล','หลังเลือกผู้ชนะ',false,'var(--purple-deep)')}
+      ${kpiCard(null,setup,'รออนุมัติให้จัดงาน','ก่อนเปิดประมูล',false,'var(--purple-deep)','ti-settings')}
+      ${kpiCard(null,result,'รออนุมัติผลประมูล','หลังเลือกผู้ชนะ',false,'var(--purple-deep)','ti-award')}
       ${onlyAppr?apprHistoryInline():''}</div></div>`;
   }
   g.innerHTML=html;
 }
-function kpiCard(key,num,label,sub,badge,accent){
+function kpiCard(key,num,label,sub,badge,accent,icon){
   const active=kpiFilter===key?'active-card':'';
   const click=key?`onclick="toggleKpiFilter('${key}',this)"`:'';
   return `<div class="gcard ${active}" ${click}><div class="accent" style="background:${accent}"></div>
-    <div class="gc-top">${badge?`<span class="gc-badge"><i class="ti ti-alert-circle"></i></span>`:''}<span class="gc-num">${num}</span></div>
+    <div class="gc-top"><span class="gc-num">${num}</span>${icon?`<span class="gc-ic" style="color:${accent}">${badge?`<i class="ti ti-alert-circle"></i>`:`<i class="ti ${icon}"></i>`}</span>`:''}</div>
     <div class="gc-label ${badge?'c-danger':''}">${label}</div><div class="gc-sub">${sub}</div></div>`;
 }
 function apprHistoryInline(){
@@ -743,6 +770,10 @@ function goPage(p){curPage=p;renderMain();}
 function onQuery(){curPage=1;const o=document.getElementById('loadingMain');o.classList.add('show');setTimeout(()=>{renderMain();o.classList.remove('show');},180);}
 function resetAll(){document.getElementById('searchInput').value='';document.getElementById('fieldSelect').value='all';dateRange={from:null,to:null};document.getElementById('dateLblMain').textContent='Select Date';document.getElementById('dateBtnMain').classList.remove('has-val');curPage=1;renderMain();}
 
+function apprTypePill(kind){
+  const setup=kind==='Setup Approval';
+  return `<span class="ap-type ${setup?'ap-setup':'ap-result'}"><i class="ti ${setup?'ti-settings':'ti-award'}"></i> ${setup?'อนุมัติจัดงาน':'อนุมัติผลประมูล'}</span>`;
+}
 /* ===== APPROVAL TABLE ===== */
 function renderApproval(){
   const u=USERS[currentUser];
@@ -751,7 +782,7 @@ function renderApproval(){
   document.getElementById('apprSeeAllN').textContent=approvalQueue.length;
   document.getElementById('apprBody').innerHTML=approvalQueue.map(x=>`<tr class="row-appr" onclick="openApprovalList()">
     <td class="td-mono">${x.id}</td><td class="td-clamp" style="max-width:280px">${x.name}</td>
-    <td><span class="ap-type ${x.kind==='Setup Approval'?'ap-setup':'ap-result'}">${x.kind==='Setup Approval'?'อนุมัติจัดงาน':'อนุมัติผลประมูล'}</span></td>
+    <td>${apprTypePill(x.kind)}</td>
     <td>${x.requester||'-'}</td><td>${x.date}</td></tr>`).join('');
 }
 
@@ -764,10 +795,11 @@ function renderSide(){
     <div class="up-day ${u.live?'d-live':'d-sched'}"><div class="d">${u.d}</div><div class="m">${u.m}</div></div>
     <div class="up-info"><div class="up-name">${u.name}</div><div class="up-sub">${u.id}</div>
     <div class="up-tag ${u.live?'up-tag-live':'up-tag-sched'}">${u.live?'<span class="live-dot"></span> Live ตอนนี้':'<i class="ti ti-clock"></i> '+u.time}</div></div></div>`).join('');
-  const quick=[['qa-ic-all','ti-stack-2','All Auctions','งานทั้งหมดทุกสถานะ','92','qa-num-all','openList("all")'],
-    ['qa-ic-complete','ti-award','Award Completed','งานที่ได้ผู้ชนะแล้ว','42','qa-num-complete','openList("complete")'],
-    ['qa-ic-cancel','ti-ban','Canceled','งานที่ถูกยกเลิก','29','qa-num-cancel','openList("canceled")'],
-    ['qa-ic-history','ti-history','ประวัติการอนุมัติ','อนุมัติ + ตีกลับ','60','qa-num-history','openApprovalList()']];
+  const cAll=auctions.length, cComplete=auctions.filter(a=>a.award==='awarded').length, cCancel=auctions.filter(a=>auctionPhase(a)==='Canceled').length;
+  const quick=[['qa-ic-all','ti-stack-2','All Auctions','งานทั้งหมดทุกสถานะ',cAll,'qa-num-all','openList("all")'],
+    ['qa-ic-complete','ti-award','Award Completed','งานที่ได้ผู้ชนะแล้ว',cComplete,'qa-num-complete','openList("complete")'],
+    ['qa-ic-cancel','ti-ban','Canceled','งานที่ถูกยกเลิก',cCancel,'qa-num-cancel','openList("canceled")'],
+    ['qa-ic-history','ti-history','ประวัติการอนุมัติ','อนุมัติ + ตีกลับ',approvalQueue.length,'qa-num-history','openApprovalList()']];
   document.getElementById('quickBody').innerHTML=quick.map(q=>`<div class="qa-item" onclick='${q[6]}'>
     <div class="qa-ic ${q[0]}"><i class="ti ${q[1]}"></i></div>
     <div class="qa-meta"><div class="qa-title">${q[2]}</div><div class="qa-desc">${q[3]}</div></div>
@@ -883,26 +915,97 @@ function openQA(id){
   openModal('qaOverlay');
 }
 function submitQA(id){closeModal('qaOverlay');showToast('ส่งคำตอบเรียบร้อยแล้ว');}
+/* ===== LIST VIEW (dedicated filterable page) ===== */
+let listKind='all', listPage=1;
+const listPerPage=8;
 function openApprovalList(){openList('approval');}
 function openList(kind){
   document.querySelectorAll('.tb-dd').forEach(d=>d.classList.remove('open'));
+  listKind=kind; listPage=1;
+  // reset filters
+  const s=document.getElementById('listSearch');if(s)s.value='';
+  document.getElementById('listField').value='all';
+  dateRange={from:null,to:null};
+  const bl=document.getElementById('dateLblList');if(bl){bl.textContent='Select Date';document.getElementById('dateBtnList').classList.remove('has-val');}
   const titles={all:'All Auctions',complete:'Award Completed',canceled:'Canceled',approval:'ประวัติการอนุมัติ / Approval Queue'};
-  document.getElementById('listTitle').innerHTML=`<i class="ti ti-list-details" style="color:var(--primary)"></i> ${titles[kind]||'รายการ'}`;
-  let rows='';
-  if(kind==='approval'){
-    rows=`<table><thead><tr><th>รหัส</th><th>ชื่อ</th><th>ประเภท</th><th>ผู้ขออนุมัติ</th><th>วันที่</th></tr></thead><tbody>${
-      approvalQueue.map(x=>`<tr class="row-appr"><td class="td-mono">${x.id}</td><td>${x.name}</td>
-      <td><span class="ap-type ${x.kind==='Setup Approval'?'ap-setup':'ap-result'}">${x.kind==='Setup Approval'?'อนุมัติจัดงาน':'อนุมัติผลประมูล'}</span></td>
-      <td>${x.requester||'-'}</td><td>${x.date}</td></tr>`).join('')}</tbody></table>`;
-  } else {
-    let list=auctions;
-    if(kind==='complete')list=auctions.filter(a=>a.award==='awarded');
-    if(kind==='canceled')list=auctions.filter(a=>auctionPhase(a)==='Canceled');
-    rows=`<table><thead><tr><th>AUCTIONID</th><th>NAME</th><th>STATUS</th><th>AWARD</th></tr></thead><tbody>${
-      list.map(a=>`<tr class="${rowClass(a)}"><td class="td-mono">${a.id}</td><td>${a.name}</td><td>${statusPill(a)}</td><td>${awardPill(a)}</td></tr>`).join('')||`<tr class="empty-row"><td colspan="4">ไม่มีรายการ</td></tr>`}</tbody></table>`;
+  document.getElementById('listViewTitle').textContent=titles[kind]||'รายการ';
+  // status filter options (auction kinds only)
+  const sf=document.getElementById('listStatus');
+  if(kind==='approval'){sf.style.display='none';}
+  else{
+    sf.style.display='';
+    const opts=['all','Draft','Awaiting Approval','Rejected by Approver','PTVN Review','Rejected by PTVN','Active','Closed','Complete','Canceled'];
+    sf.innerHTML=opts.map(o=>`<option value="${o}">${o==='all'?'All Status':o}</option>`).join('');
+    sf.value='all';
   }
-  document.getElementById('listBody').innerHTML=`<div class="table-wrap">${rows}</div>`;
-  openModal('listOverlay');
+  // switch views
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('overviewView').classList.add('hidden');
+  document.getElementById('page2View').classList.add('hidden');
+  document.getElementById('listView').classList.remove('hidden');
+  window.scrollTo(0,0);
+  renderListRows();
+}
+function backFromList(){
+  document.getElementById('listView').classList.add('hidden');
+  document.getElementById('overviewView').classList.remove('hidden');
+  const t=document.querySelector('.nav-tab[data-page="overview"]');if(t)t.classList.add('active');
+  window.scrollTo(0,0);
+}
+function queryListAuctions(){
+  let list=auctions.slice();
+  if(listKind==='complete')list=list.filter(a=>a.award==='awarded');
+  if(listKind==='canceled')list=list.filter(a=>auctionPhase(a)==='Canceled');
+  const q=document.getElementById('listSearch').value.trim().toLowerCase();
+  const f=document.getElementById('listField').value;
+  if(q)list=list.filter(a=>{
+    if(f==='id')return a.id.toLowerCase().includes(q);
+    if(f==='name')return a.name.toLowerCase().includes(q);
+    return a.id.toLowerCase().includes(q)||a.name.toLowerCase().includes(q);
+  });
+  const st=document.getElementById('listStatus').value;
+  if(st&&st!=='all')list=list.filter(a=>auctionPhase(a)===st);
+  if(dateRange.from&&dateRange.to)list=list.filter(a=>{const d=new Date(a.req);return d>=dateRange.from&&d<=dateRange.to;});
+  return list;
+}
+function renderListRows(){
+  const wrap=document.getElementById('listViewTableWrap');
+  if(listKind==='approval'){
+    document.getElementById('listStatus').style.display='none';
+    document.getElementById('listViewCount').textContent=approvalQueue.length+' รายการ';
+    wrap.innerHTML=`<table><thead><tr><th>รหัสการประมูล</th><th>ชื่อการประมูล</th><th>ประเภทการอนุมัติ</th><th>ผู้ขออนุมัติ</th><th>วันที่ขอ</th></tr></thead><tbody>${
+      approvalQueue.map(x=>`<tr class="row-appr"><td class="td-mono">${x.id}</td><td class="td-clamp">${x.name}</td>
+      <td>${apprTypePill(x.kind)}</td><td>${x.requester||'-'}</td><td>${x.date}</td></tr>`).join('')}</tbody></table>`;
+    document.getElementById('listPgInfo').innerHTML='';document.getElementById('listPgBtns').innerHTML='';
+    return;
+  }
+  const list=queryListAuctions();
+  document.getElementById('listViewCount').textContent=list.length+' รายการ';
+  const pages=Math.max(1,Math.ceil(list.length/listPerPage));
+  if(listPage>pages)listPage=pages;
+  const start=(listPage-1)*listPerPage;
+  const page=list.slice(start,start+listPerPage);
+  wrap.innerHTML=`<table><thead><tr><th>AUCTIONID</th><th>FORMAT</th><th>TYPE</th><th>AUCTION NAME</th><th>CREATOR</th><th>วันที่ขอ</th><th>STATUS</th><th>AWARD STATUS</th></tr></thead><tbody>${
+    page.map(a=>`<tr class="${rowClass(a)}" onclick="openDetail('${a.id}')"><td class="td-mono">${a.id}</td><td>${a.fmt}</td><td>${a.type}</td>
+    <td class="td-clamp">${a.name}</td><td>${USERS[a.creator].name}</td><td>${fmtReq(a.req)}</td><td>${statusPill(a)}</td><td>${awardPill(a)}</td></tr>`).join('')
+    ||`<tr class="empty-row"><td colspan="8">ไม่พบรายการ</td></tr>`}</tbody></table>`;
+  // pagination
+  const info=list.length?((start+1)+'-'+Math.min(listPage*listPerPage,list.length)):'0';
+  document.getElementById('listPgInfo').innerHTML=`แสดง <strong>${info}</strong> จาก <strong>${list.length}</strong> รายการ`;
+  let b=`<button class="pg-btn" ${listPage===1?'disabled':''} onclick="goListPage(${listPage-1})"><i class="ti ti-chevron-left"></i></button>`;
+  for(let i=1;i<=pages;i++)b+=`<button class="pg-btn ${i===listPage?'active':''}" onclick="goListPage(${i})">${i}</button>`;
+  b+=`<button class="pg-btn" ${listPage===pages?'disabled':''} onclick="goListPage(${listPage+1})"><i class="ti ti-chevron-right"></i></button>`;
+  document.getElementById('listPgBtns').innerHTML=b;
+}
+function goListPage(p){listPage=p;renderListRows();}
+function onListQuery(){listPage=1;renderListRows();}
+function resetListFilters(){
+  document.getElementById('listSearch').value='';
+  document.getElementById('listField').value='all';
+  const sf=document.getElementById('listStatus');if(sf)sf.value='all';
+  dateRange={from:null,to:null};
+  const bl=document.getElementById('dateLblList');if(bl){bl.textContent='Select Date';document.getElementById('dateBtnList').classList.remove('has-val');}
+  listPage=1;renderListRows();
 }
 function openModal(id){document.getElementById(id).classList.add('open');}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
@@ -950,6 +1053,7 @@ function renderCharts(){
 
 /* ===== NAV / USER ===== */
 function switchPage(p,el){document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');
+  document.getElementById('listView').classList.add('hidden');
   document.getElementById('overviewView').classList.toggle('hidden',p!=='overview');
   document.getElementById('page2View').classList.toggle('hidden',p!=='page2');}
 function switchUser(u){currentUser=u;kpiFilter=null;curPage=1;const usr=USERS[u];
